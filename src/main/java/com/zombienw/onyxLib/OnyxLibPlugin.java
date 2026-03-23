@@ -3,11 +3,13 @@ package com.zombienw.onyxLib;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class OnyxLibPlugin extends JavaPlugin {
+
     private static OnyxLibPlugin instance;
     private OnyxLib api;
 
     @Override
     public void onEnable() {
+        instance = this;
         this.api = new OnyxLib(this);
         OnyxLibProvider.set(this.api);
         getLogger().info("OnyxLib enabled.");
@@ -15,14 +17,11 @@ public final class OnyxLibPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        OnyxLibProvider.clear();
+        instance = null;
         getLogger().info("OnyxLib disabled.");
     }
 
-    public static OnyxLibPlugin getInstance() {
-        return instance;
-    }
-
-    public OnyxLib getApi() {
-        return api;
-    }
+    public static OnyxLibPlugin getInstance() { return instance; }
+    public OnyxLib getApi() { return api; }
 }

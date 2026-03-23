@@ -1,10 +1,33 @@
 package com.zombienw.onyxLib;
 
-import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.Bukkit;
 
-public record OnyxLib(JavaPlugin plugin) {
+import java.util.HashMap;
+import java.util.Map;
 
-    public void hello() {
-        plugin.getLogger().info("Hello from OnyxLib API");
+public class OnyxLib {
+
+    private final OnyxLibPlugin plugin;
+    private final ItemService itemService;
+    private final Map<String, OnyxNamespace> namespaces = new HashMap<>();
+
+    OnyxLib(OnyxLibPlugin plugin) {
+        this.plugin = plugin;
+        this.itemService = new ItemService(plugin);
+
+        Bukkit.getPluginManager().registerEvents(
+                new ItemInteractionListener(itemService), plugin
+        );
+    }
+
+    public OnyxLibPlugin getPlugin() { return plugin; }
+
+    public ItemService items() { return itemService; }
+
+    public OnyxNamespace namespace(String namespace) {
+        return namespaces.computeIfAbsent(
+                namespace.toLowerCase(),
+                ns -> new OnyxNamespace(ns, this)
+        );
     }
 }
