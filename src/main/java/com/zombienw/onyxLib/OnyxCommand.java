@@ -8,25 +8,44 @@ import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-public class OnyxGiveCommand implements CommandExecutor, TabCompleter {
+public class OnyxCommand implements CommandExecutor, TabCompleter {
 
+    private static final List<String> SUBCOMMANDS = List.of("give", "generatepack");
     private static final List<String> AMOUNT_SUGGESTIONS = List.of("1", "8", "16", "32", "64");
 
     private final ItemService itemService;
+    private final PackGenerator packGenerator;
 
-    public OnyxGiveCommand(ItemService itemService) {
+    public OnyxCommand(ItemService itemService, PackGenerator packGenerator) {
         this.itemService = itemService;
+        this.packGenerator = packGenerator;
     }
 
     /// Execution
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        // /onyx give <player> <namespace:id> [amount]
-        if (args.length < 3 || !args[0].equalsIgnoreCase("give")) {
+        if (args.length == 0) {
+            sender.sendMessage("Usage: /onyx <give|generatepack>");
+            return true;
+        }
+
+        return switch (args[0].toLowerCase()) {
+            case "give" -> handleGive(sender, args);
+            case "generatepack" -> handleGeneratePack(sender);
+            default -> {
+                sender.sendMessage("Unknown subcommand. Usage: /onyx <give|generatepack>");
+                yield true;
+            }
+        };
+    }
+
+    private boolean handleGive(CommandSender sender, String[] args) {
+        if (args.length < 3) {
             sender.sendMessage("Usage: /onyx give <player> <namespace:item> [amount]");
             return true;
         }
@@ -53,8 +72,7 @@ public class OnyxGiveCommand implements CommandExecutor, TabCompleter {
             }
         }
 
-        // Restate amount because lambdas don't like it otherwise
-        int finalAmount = amount;
+        final int finalAmount = amount;
         itemService.get(fullId).ifPresentOrElse(
                 registered -> {
                     ItemStack stack = itemService.create(fullId, finalAmount);
@@ -67,23 +85,36 @@ public class OnyxGiveCommand implements CommandExecutor, TabCompleter {
         return true;
     }
 
+    private boolean handleGeneratePack(CommandSender sender) {
+        sender.sendMessage("Generating resource pack...");
+        try {
+            String result = packGenerator.generate();
+            sender.sendMessage(result);
+        } catch (IOException e) {
+            sender.sendMessage("Pack generation failed: " + e.getMessage());
+        }
+        return true;
+    }
+
     /// Tab Completion
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
-        // args[0] is always "give" (routed from OnyxCommand)
-        return switch (args.length) {
-            case 1 -> List.of("give");
-            case 2 -> partialMatch(args[1], Bukkit.getOnlinePlayers()
-                    .stream()
-                    .map(Player::getName)
-                    .toList());
-            case 3 -> partialMatch(args[2], itemService.all()
-                    .stream()
-                    .map(RegisteredItem::getFullId)
-                    .toList());
-            case 4 -> partialMatch(args[3], AMOUNT_SUGGESTIONS);
-            default -> Collections.emptyList();
-        };
+        if (args.length == 1) {
+            return partialMatch(args[0], SUBCOMMANDS);
+        }
+
+        if (args[0].equalsIgnoreCase("give")) {
+            return switch (args.length) {
+                case 2 -> partialMatch(args[1], Bukkit.getOnlinePlayers()
+                        .stream().map(Player::getName).toList());
+                case 3 -> partialMatch(args[2], itemService.all()
+                        .stream().map(RegisteredItem::getFullId).toList());
+                case 4 -> partialMatch(args[3], AMOUNT_SUGGESTIONS);
+                default -> Collections.emptyList();
+            };
+        }
+
+        return Collections.emptyList();
     }
 
     private List<String> partialMatch(String input, Collection<String> options) {

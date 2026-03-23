@@ -1,6 +1,6 @@
 package com.zombienw.onyxLib;
 
-import org.bukkit.Bukkit;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,13 +9,15 @@ public class OnyxLib {
 
     private final OnyxLibPlugin plugin;
     private final ItemService itemService;
+    private final PackGenerator packGenerator;
     private final Map<String, OnyxNamespace> namespaces = new HashMap<>();
 
     OnyxLib(OnyxLibPlugin plugin) {
         this.plugin = plugin;
         this.itemService = new ItemService(plugin);
+        this.packGenerator = new PackGenerator(itemService, plugin.getDataFolder());
 
-        OnyxGiveCommand giveCommand = new OnyxGiveCommand(itemService);
+        OnyxCommand giveCommand = new OnyxCommand(itemService, packGenerator);
         var onyxCommand = plugin.getCommand("onyx");
         if (onyxCommand != null) {
             onyxCommand.setExecutor(giveCommand);
@@ -27,10 +29,10 @@ public class OnyxLib {
 
     public ItemService items() { return itemService; }
 
-    public OnyxNamespace namespace(String namespace) {
+    public OnyxNamespace namespace(String namespace, JavaPlugin owningPlugin) {
         return namespaces.computeIfAbsent(
                 namespace.toLowerCase(),
-                ns -> new OnyxNamespace(ns, this)
+                ns -> new OnyxNamespace(ns, this, owningPlugin)
         );
     }
 }

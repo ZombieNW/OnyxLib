@@ -1,32 +1,44 @@
 package com.zombienw.onyxLib;
 
+import io.papermc.paper.datacomponent.item.CustomModelData;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.components.CustomModelDataComponent;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.*;
 
 public class ItemService {
     private final Map<String, RegisteredItem> items = new HashMap<>();
     private final NamespacedKey itemIdKey;
+    private final CMDRegistry cmdRegistry = new CMDRegistry();
 
     public ItemService(OnyxLibPlugin plugin) {
         this.itemIdKey = new NamespacedKey(plugin, "item_id");
     }
 
     /// Registration
-    public RegisteredItem register(String namespace, CustomItem item) {
+    public RegisteredItem register(String namespace, CustomItem item, JavaPlugin owningPlugin) {
         String fullId = namespace + ":" + item.getId();
 
         if (items.containsKey(fullId)) {
             throw new IllegalArgumentException("Duplicate custom item id: " + fullId);
         }
 
-        RegisteredItem registered = new RegisteredItem(namespace, item);
+        RegisteredItem registered = new RegisteredItem(namespace, item, owningPlugin);
+
+        // If the item has a texture asset, assign a CMD value now
+        if (item.hasAsset()) {
+            int override = item.getAsset().getCmdOverride();
+            int cmd = cmdRegistry.assign(item.getMaterial(), override);
+            registered.setAssignedCmd(cmd);
+        }
+
         items.put(fullId, registered);
         return registered;
     }
@@ -53,15 +65,22 @@ public class ItemService {
 
         ItemStack stack = registered.getItem().cloneTemplate();
         stack.setAmount(Math.max(1, amount));
-        tagStack(stack, fullId);
-        return stack;
-    }
 
-    private void tagStack(ItemStack stack, String fullId) {
         ItemMeta meta = stack.getItemMeta();
-        if (meta == null) return;
+        if (meta == null) return stack;
+
         meta.getPersistentDataContainer().set(itemIdKey, PersistentDataType.STRING, fullId);
+
+        // Stamp the assigned CMD so the client renders the right texture
+        if (registered.hasCmd()) {
+            // Use the new component API (replaces deprecated setCustomModelData(int))
+            CustomModelDataComponent cmdComponent = meta.getCustomModelDataComponent();
+            cmdComponent.setFloats(List.of((float) registered.getAssignedCmd()));
+            meta.setCustomModelDataComponent(cmdComponent);
+        }
+
         stack.setItemMeta(meta);
+        return stack;
     }
 
     /// Identification
