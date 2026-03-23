@@ -20,10 +20,12 @@ public class PackGenerator {
 
     private final ItemService itemService;
     private final File outputFile;
+    private final JavaPlugin plugin;
 
-    public PackGenerator(ItemService itemService, File onyxLibDataFolder) {
+    public PackGenerator(ItemService itemService, File onyxLibDataFolder, JavaPlugin plugin) {
         this.itemService = itemService;
         this.outputFile = new File(onyxLibDataFolder, "resourcepack.zip");
+        this.plugin = plugin;
     }
 
     // Generates pack, returns summary
@@ -40,6 +42,7 @@ public class PackGenerator {
 
         try {
             writeMcMeta(tempDir);
+            writeIconImage(tempDir);
             writeTextures(tempDir, assetItems);
             writeModelFiles(tempDir, assetItems);
             writeItemDefinitions(tempDir, assetItems);
@@ -64,6 +67,15 @@ public class PackGenerator {
             """.formatted(PACK_FORMAT, PACK_DESCRIPTION);
 
         Files.writeString(root.resolve("pack.mcmeta"), mcmeta);
+    }
+
+    private void writeIconImage(Path root) throws IOException {
+        InputStream stream = plugin.getResource("icon.png");
+        Path dest = root.resolve("pack.png");
+        if (stream == null) {
+            throw new IOException("Zach, how did you forget the icon.png");
+        }
+        Files.copy(stream, dest, StandardCopyOption.REPLACE_EXISTING);
     }
 
     private void writeTextures(Path root, List<RegisteredItem> items) throws IOException {

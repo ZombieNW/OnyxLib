@@ -15,7 +15,7 @@ public class OnyxLib {
     OnyxLib(OnyxLibPlugin plugin) {
         this.plugin = plugin;
         this.itemService = new ItemService(plugin);
-        this.packGenerator = new PackGenerator(itemService, plugin.getDataFolder());
+        this.packGenerator = new PackGenerator(itemService, plugin.getDataFolder(), plugin);
 
         OnyxCommand giveCommand = new OnyxCommand(itemService, packGenerator);
         var onyxCommand = plugin.getCommand("onyx");
