@@ -1,5 +1,9 @@
 package com.zombienw.onyxLib;
 
+import com.zombienw.onyxLib.core.OnyxCommand;
+import com.zombienw.onyxLib.core.OnyxNamespace;
+import com.zombienw.onyxLib.items.ItemService;
+import com.zombienw.onyxLib.core.PackGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.HashMap;

@@ -1,4 +1,4 @@
-package com.zombienw.onyxLib;
+package com.zombienw.onyxLib.items;
 
 public class ItemAsset {
 

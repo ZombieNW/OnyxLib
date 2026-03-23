@@ -1,8 +1,6 @@
-package com.zombienw.onyxLib;
+package com.zombienw.onyxLib.items;
 
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.util.function.Consumer;
 
 public class RegisteredItem {
 

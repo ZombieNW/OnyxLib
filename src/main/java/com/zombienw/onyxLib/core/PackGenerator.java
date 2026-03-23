@@ -1,5 +1,8 @@
-package com.zombienw.onyxLib;
+package com.zombienw.onyxLib.core;
 
+import com.zombienw.onyxLib.items.ItemAsset;
+import com.zombienw.onyxLib.items.ItemService;
+import com.zombienw.onyxLib.items.RegisteredItem;
 import org.bukkit.Material;
 import org.bukkit.plugin.java.JavaPlugin;
 

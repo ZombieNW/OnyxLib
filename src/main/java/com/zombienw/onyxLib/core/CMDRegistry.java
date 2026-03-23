@@ -1,4 +1,4 @@
-package com.zombienw.onyxLib;
+package com.zombienw.onyxLib.core;
 
 import org.bukkit.Material;
 
@@ -14,7 +14,7 @@ public class CMDRegistry {
     // material → set of all taken values (auto + override)
     private final Map<Material, Set<Integer>> taken = new HashMap<>();
 
-    int assign(Material material, int override) {
+    public int assign(Material material, int override) {
         var takenForMaterial = taken.computeIfAbsent(material, m -> new java.util.HashSet<>());
 
         if (override != 0) {

@@ -1,5 +1,7 @@
-package com.zombienw.onyxLib;
+package com.zombienw.onyxLib.core;
 
+import com.zombienw.onyxLib.items.ItemService;
+import com.zombienw.onyxLib.items.RegisteredItem;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;

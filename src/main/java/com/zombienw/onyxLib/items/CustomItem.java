@@ -1,5 +1,6 @@
-package com.zombienw.onyxLib;
+package com.zombienw.onyxLib.items;
 
+import com.zombienw.onyxLib.core.OnyxValidation;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
