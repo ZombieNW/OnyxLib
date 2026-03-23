@@ -18,6 +18,13 @@ public class OnyxLib {
         Bukkit.getPluginManager().registerEvents(
                 new ItemInteractionListener(itemService), plugin
         );
+
+        OnyxGiveCommand giveCommand = new OnyxGiveCommand(itemService);
+        var onyxCommand = plugin.getCommand("onyx");
+        if (onyxCommand != null) {
+            onyxCommand.setExecutor(giveCommand);
+            onyxCommand.setTabCompleter(giveCommand);
+        }
     }
 
     public OnyxLibPlugin getPlugin() { return plugin; }
