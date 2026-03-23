@@ -159,7 +159,7 @@ public class PackGenerator {
         for (var entry : byMaterial.entrySet()) {
             String materialKey = entry.getKey().getKey().getKey(); // e.g. "iron_nugget"
             List<RegisteredItem> group = entry.getValue();
-            group.sort(Comparator.comparingInt(RegisteredItem::getAssignedCmd));
+            group.sort(Comparator.comparing(RegisteredItem::getFullId));
 
             String itemDefJson = buildItemDefinitionJson(materialKey, group);
 
@@ -171,39 +171,43 @@ public class PackGenerator {
     }
 
     private String buildItemDefinitionJson(String materialKey, List<RegisteredItem> items) {
-        StringBuilder entries = new StringBuilder();
+        StringBuilder cases = new StringBuilder();
 
         for (int i = 0; i < items.size(); i++) {
             RegisteredItem registered = items.get(i);
+            String fullId = registered.getFullId();
             String namespace = registered.getNamespace();
             String itemId = registered.getItem().getId();
 
-            // threshold is the float value stored in the custom_model_data component
-            float threshold = (float) registered.getAssignedCmd();
-
-            // Model reference points to our generated model file
+            // The specific model file reference (e.g., onyxtest:item/blue)
             String modelRef = namespace + ":item/" + itemId;
 
-            entries.append("        {\n")
-                    .append("          \"threshold\": ").append(threshold).append(",\n")
+            cases.append("        {\n")
+                    .append("          \"when\": \"").append(fullId).append("\",\n")
                     .append("          \"model\": { \"type\": \"minecraft:model\", \"model\": \"").append(modelRef).append("\" }\n")
                     .append("        }");
 
-            if (i < items.size() - 1) entries.append(",");
-            entries.append("\n");
+            if (i < items.size() - 1) {
+                cases.append(",");
+            }
+            cases.append("\n");
         }
 
         return """
-                {
-                  "model": {
-                    "type": "minecraft:range_dispatch",
-                    "property": "minecraft:custom_model_data",
-                    "fallback": { "type": "minecraft:model", "model": "minecraft:item/%s" },
-                    "entries": [
-                %s    ]
-                  }
-                }
-                """.formatted(materialKey, entries);
+            {
+              "model": {
+                "type": "minecraft:select",
+                "property": "minecraft:custom_model_data",
+                "index": 0,
+                "fallback": { 
+                  "type": "minecraft:model", 
+                  "model": "minecraft:item/%s" 
+                },
+                "cases": [
+            %s    ]
+              }
+            }
+            """.formatted(materialKey, cases.toString());
     }
 
     /// Zip & Cleanup

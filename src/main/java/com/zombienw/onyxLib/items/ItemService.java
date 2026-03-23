@@ -30,14 +30,6 @@ public class ItemService {
         }
 
         RegisteredItem registered = new RegisteredItem(namespace, item, owningPlugin);
-
-        // If the item has a texture asset, assign a CMD value now
-        if (item.hasAsset()) {
-            int override = item.getAsset().getCmdOverride();
-            int cmd = cmdRegistry.assign(item.getMaterial(), override);
-            registered.setAssignedCmd(cmd);
-        }
-
         items.put(fullId, registered);
         return registered;
     }
@@ -68,14 +60,14 @@ public class ItemService {
         ItemMeta meta = stack.getItemMeta();
         if (meta == null) return stack;
 
+        // Stamp PDC tag to identify the item
         meta.getPersistentDataContainer().set(itemIdKey, PersistentDataType.STRING, fullId);
 
-        // Stamp the assigned CMD so the client renders the right texture
-        if (registered.hasCmd()) {
-            // Use the new component API (replaces deprecated setCustomModelData(int))
-            CustomModelDataComponent cmdComponent = meta.getCustomModelDataComponent();
-            cmdComponent.setFloats(List.of((float) registered.getAssignedCmd()));
-            meta.setCustomModelDataComponent(cmdComponent);
+        // Stamp CMD for pretty visuals :3
+        if (registered.getItem().hasAsset()) {
+            CustomModelDataComponent cmd = meta.getCustomModelDataComponent();
+            cmd.setStrings(List.of(fullId));
+            meta.setCustomModelDataComponent(cmd);
         }
 
         stack.setItemMeta(meta);

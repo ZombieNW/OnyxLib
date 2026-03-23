@@ -8,7 +8,6 @@ public class RegisteredItem {
     private final String namespace;
     private final CustomItem item;
     private final JavaPlugin owningPlugin;
-    private int assignedCmd = 0;
 
     public RegisteredItem(String namespace, CustomItem item, JavaPlugin owningPlugin) {
         this.namespace = namespace;
@@ -21,11 +20,6 @@ public class RegisteredItem {
     public String getNamespace() { return namespace; }
     public CustomItem getItem() { return item; }
     public JavaPlugin getOwningPlugin() { return owningPlugin; }
-
-    // CMD Value assigned at registration. 0 if no asset
-    public int getAssignedCmd() { return assignedCmd; }
-    public boolean hasCmd() { return assignedCmd != 0; }
-    void setAssignedCmd(int cmd) { this.assignedCmd = cmd; }
 
 
     @Override
