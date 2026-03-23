@@ -15,10 +15,6 @@ public class OnyxLib {
         this.plugin = plugin;
         this.itemService = new ItemService(plugin);
 
-        Bukkit.getPluginManager().registerEvents(
-                new ItemInteractionListener(itemService), plugin
-        );
-
         OnyxGiveCommand giveCommand = new OnyxGiveCommand(itemService);
         var onyxCommand = plugin.getCommand("onyx");
         if (onyxCommand != null) {

@@ -80,12 +80,18 @@ public class ItemService {
         return getId(stack).flatMap(this::get);
     }
 
+    // isCustomItem(stack) - is it an onyxlib item at all
     public boolean isCustomItem(ItemStack stack) {
         return getId(stack).isPresent();
     }
 
-    /// Interaction
-    void dispatch(ItemStack stack, ItemInteraction interaction) {
-        fromStack(stack).ifPresent(item -> item.handleInteraction(interaction));
+    // is(stack, "plugin:sword") - is it this specific item
+    public boolean is(ItemStack stack, String fullId) {
+        return getId(stack).map(id -> id.equals(fullId)).orElse(false);
+    }
+
+    // isInNameSpace(stack, "plugin") - is it an item from this plugin
+    public boolean isInNamespace(ItemStack stack, String namespace) {
+        return getId(stack).map(id -> id.startsWith(namespace + ":")).orElse(false);
     }
 }
