@@ -88,17 +88,27 @@ public class PackGenerator {
             JavaPlugin owningPlugin = registered.getOwningPlugin();
             String namespace = registered.getNamespace();
 
-            String resourcePath = "assets/" + namespace + "/textures/" + asset.getTexturePath() + ".png";
-
-            InputStream stream = owningPlugin.getResource(resourcePath);
-            if (stream == null) {
-                throw new IOException("Missing texture in " + owningPlugin.getName() + " jar: " + resourcePath);
+            // Collect all textures needed for this asset
+            java.util.List<String> texturePaths = new java.util.ArrayList<>();
+            if (asset.getBlockModel() != null) {
+                texturePaths.addAll(asset.getBlockModel().getTexturePaths());
+            } else if (asset.getTexturePath() != null) {
+                texturePaths.add(asset.getTexturePath());
             }
 
-            Path dest = root.resolve(resourcePath);
-            Files.createDirectories(dest.getParent());
-            try (stream) {
-                Files.copy(stream, dest, StandardCopyOption.REPLACE_EXISTING);
+            for (String texPath : texturePaths) {
+                String resourcePath = "assets/" + namespace + "/textures/" + texPath + ".png";
+                InputStream stream = owningPlugin.getResource(resourcePath);
+
+                if (stream == null) {
+                    throw new IOException("Missing texture in " + owningPlugin.getName() + " jar: " + resourcePath);
+                }
+
+                Path dest = root.resolve(resourcePath);
+                Files.createDirectories(dest.getParent());
+                try (stream) {
+                    Files.copy(stream, dest, StandardCopyOption.REPLACE_EXISTING);
+                }
             }
         }
     }
@@ -118,9 +128,16 @@ public class PackGenerator {
             Path modelDest = root.resolve("assets/" + namespace + "/models/item/" + itemId + ".json");
             Files.createDirectories(modelDest.getParent());
 
-            if (asset.isCustomModel()) {
+            // blockmodel
+            if (asset.getBlockModel() != null) {
+                Files.writeString(modelDest, asset.getBlockModel().generateJson(namespace));
+            }
+            // manual json
+            else if (asset.isCustomModel()) {
                 copyModelFromJar(registered, modelDest);
-            } else {
+            }
+            // item model
+            else {
                 generateModel(asset, namespace, modelDest);
             }
         }
