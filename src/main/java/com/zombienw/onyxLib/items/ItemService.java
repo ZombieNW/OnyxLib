@@ -66,7 +66,8 @@ public class ItemService {
         // Stamp CMD for pretty visuals :3
         if (registered.getItem().hasAsset()) {
             CustomModelDataComponent cmd = meta.getCustomModelDataComponent();
-            cmd.setStrings(List.of(fullId));
+            String modelPath = registered.getNamespace() + ":item/" + registered.getItem().getId();
+            cmd.setStrings(List.of(modelPath));
             meta.setCustomModelDataComponent(cmd);
         }
 

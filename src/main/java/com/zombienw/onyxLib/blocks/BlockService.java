@@ -1,5 +1,6 @@
 package com.zombienw.onyxLib.blocks;
 
+import com.zombienw.onyxLib.items.ItemService;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemFrame;
@@ -13,12 +14,14 @@ public class BlockService {
     private final Map<String, RegisteredBlock> blocks = new HashMap<>();
     private final BlockEntityUtils utils;
     private final BlockPlacer placer;
+    private final ItemService itemService;
 
     public BlockEntityUtils utils() { return utils; }
 
-    public BlockService(JavaPlugin plugin) {
+    public BlockService(JavaPlugin plugin, ItemService itemService) {
         this.utils = new BlockEntityUtils(plugin);
-        this.placer = new BlockPlacer(utils, plugin);
+        this.placer = new BlockPlacer(utils, itemService, plugin);
+        this.itemService = itemService;
     }
 
     /// Register
@@ -53,8 +56,9 @@ public class BlockService {
     public void handleBreak(Entity markerEntity, Location dropLocation) {
         utils.getBlockId(markerEntity).flatMap(this::get).ifPresent(registered -> {
             markerEntity.remove();
+            String fullId = registered.getBlock().getRegisteredItem().getFullId();
             dropLocation.getWorld().dropItemNaturally(
-                    dropLocation, registered.getBlock().getDisplayItem()
+                    dropLocation, itemService.create(fullId)
             );
         });
     }

@@ -1,5 +1,6 @@
 package com.zombienw.onyxLib.blocks;
 
+import org.bukkit.Rotation;
 import org.bukkit.entity.Player;
 
 public enum CardinalDirection {
@@ -21,6 +22,15 @@ public enum CardinalDirection {
             case EAST  -> 270f;
             case SOUTH -> 0f;
             case WEST  -> 90f;
+        };
+    }
+
+    public Rotation toFrameRotation() {
+        return switch (this) {
+            case NORTH -> Rotation.CLOCKWISE_135;
+            case EAST  -> Rotation.CLOCKWISE;
+            case SOUTH -> Rotation.NONE;
+            case WEST  -> Rotation.COUNTER_CLOCKWISE;
         };
     }
 }

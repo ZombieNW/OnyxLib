@@ -74,26 +74,25 @@ public class PackGenerator {
 
     private void writeIconImage(Path root) throws IOException {
         InputStream stream = plugin.getResource("icon.png");
-        Path dest = root.resolve("pack.png");
         if (stream == null) {
             throw new IOException("Zach, how did you forget the icon.png");
         }
+
+        Path dest = root.resolve("pack.png");
         Files.copy(stream, dest, StandardCopyOption.REPLACE_EXISTING);
     }
 
     private void writeTextures(Path root, List<RegisteredItem> items) throws IOException {
         for (RegisteredItem registered : items) {
             ItemAsset asset = registered.getItem().getAsset();
-            JavaPlugin plugin = registered.getOwningPlugin();
+            JavaPlugin owningPlugin = registered.getOwningPlugin();
             String namespace = registered.getNamespace();
 
-            // assets/onyxtest/textures/item/ruby.png
             String resourcePath = "assets/" + namespace + "/textures/" + asset.getTexturePath() + ".png";
 
-            InputStream stream = plugin.getResource(resourcePath);
+            InputStream stream = owningPlugin.getResource(resourcePath);
             if (stream == null) {
-                throw new IOException("Missing texture in " + plugin.getName()
-                        + " jar: " + resourcePath);
+                throw new IOException("Missing texture in " + owningPlugin.getName() + " jar: " + resourcePath);
             }
 
             Path dest = root.resolve(resourcePath);
@@ -116,24 +115,42 @@ public class PackGenerator {
             String namespace = registered.getNamespace();
             String itemId = registered.getItem().getId();
 
-            // namespace:item/texturename (no .png suffix)
-            String textureRef = namespace + ":" + asset.getTexturePath();
+            Path modelDest = root.resolve("assets/" + namespace + "/models/item/" + itemId + ".json");
+            Files.createDirectories(modelDest.getParent());
 
-            String modelJson = """
-                    {
-                      "parent": "%s",
-                      "textures": {
-                        "layer0": "%s"
-                      }
-                    }
-                    """.formatted(asset.getModelParent(), textureRef);
-
-            // assets/<namespace>/models/item/<id>.json
-            Path modelPath = root.resolve("assets/" + namespace + "/models/item/" + itemId + ".json");
-            Files.createDirectories(modelPath.getParent());
-            Files.writeString(modelPath, modelJson);
+            if (asset.isCustomModel()) {
+                copyModelFromJar(registered, modelDest);
+            } else {
+                generateModel(asset, namespace, modelDest);
+            }
         }
     }
+    private void copyModelFromJar(RegisteredItem registered, Path dest) throws IOException {
+        JavaPlugin owningPlugin = registered.getOwningPlugin();
+        String resourcePath = "assets/" + registered.getNamespace() + "/models/item/" + registered.getItem().getId() + ".json";
+
+        try (InputStream stream = owningPlugin.getResource(resourcePath)) {
+            if (stream == null) {
+                throw new IOException("customModel() was set for '" + registered.getFullId()
+                        + "' but no model file found in " + owningPlugin.getName() + " jar at: " + resourcePath);
+            }
+            Files.copy(stream, dest, StandardCopyOption.REPLACE_EXISTING);
+        }
+    }
+
+    private void generateModel(ItemAsset asset, String namespace, Path dest) throws IOException {
+        String textureRef = namespace + ":" + asset.getTexturePath();
+        String modelJson = """
+            {
+              "parent": "minecraft:%s",
+              "textures": {
+                "layer0": "%s"
+              }
+            }
+            """.formatted(asset.getModelParent(), textureRef);
+        Files.writeString(dest, modelJson);
+    }
+
 
     /// I fucking hate all of this
     /// Writes an item definition JSON under assets/minecraft/items/material.json
@@ -157,16 +174,13 @@ public class PackGenerator {
                 .collect(Collectors.groupingBy(r -> r.getItem().getMaterial()));
 
         for (var entry : byMaterial.entrySet()) {
-            String materialKey = entry.getKey().getKey().getKey(); // e.g. "iron_nugget"
+            String materialKey = entry.getKey().getKey().getKey();
             List<RegisteredItem> group = entry.getValue();
             group.sort(Comparator.comparing(RegisteredItem::getFullId));
 
-            String itemDefJson = buildItemDefinitionJson(materialKey, group);
-
-            // assets/minecraft/items/<material>.json  (note: items/, not models/item/)
             Path defPath = root.resolve("assets/minecraft/items/" + materialKey + ".json");
             Files.createDirectories(defPath.getParent());
-            Files.writeString(defPath, itemDefJson);
+            Files.writeString(defPath, buildItemDefinitionJson(materialKey, group));
         }
     }
 
@@ -175,21 +189,14 @@ public class PackGenerator {
 
         for (int i = 0; i < items.size(); i++) {
             RegisteredItem registered = items.get(i);
-            String fullId = registered.getFullId();
-            String namespace = registered.getNamespace();
-            String itemId = registered.getItem().getId();
-
-            // The specific model file reference (e.g., onyxtest:item/blue)
-            String modelRef = namespace + ":item/" + itemId;
+            String modelRef = registered.getNamespace() + ":item/" + registered.getItem().getId();
 
             cases.append("        {\n")
-                    .append("          \"when\": \"").append(fullId).append("\",\n")
+                    .append("          \"when\": \"").append(modelRef).append("\",\n")
                     .append("          \"model\": { \"type\": \"minecraft:model\", \"model\": \"").append(modelRef).append("\" }\n")
                     .append("        }");
 
-            if (i < items.size() - 1) {
-                cases.append(",");
-            }
+            if (i < items.size() - 1) cases.append(",");
             cases.append("\n");
         }
 
@@ -199,9 +206,9 @@ public class PackGenerator {
                 "type": "minecraft:select",
                 "property": "minecraft:custom_model_data",
                 "index": 0,
-                "fallback": { 
-                  "type": "minecraft:model", 
-                  "model": "minecraft:item/%s" 
+                "fallback": {
+                  "type": "minecraft:model",
+                  "model": "minecraft:item/%s"
                 },
                 "cases": [
             %s    ]

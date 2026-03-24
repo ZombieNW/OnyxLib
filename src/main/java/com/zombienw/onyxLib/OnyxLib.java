@@ -23,7 +23,7 @@ public class OnyxLib {
     OnyxLib(OnyxLibPlugin plugin) {
         this.plugin = plugin;
         this.itemService = new ItemService(plugin);
-        this.blockService = new BlockService(plugin);
+        this.blockService = new BlockService(plugin, itemService);
         this.packGenerator = new PackGenerator(itemService, plugin.getDataFolder(), plugin);
 
         Bukkit.getPluginManager().registerEvents(

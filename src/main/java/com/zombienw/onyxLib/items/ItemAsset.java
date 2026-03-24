@@ -6,14 +6,20 @@ public class ItemAsset {
 
     private final String texturePath;
     private final String modelParent;
+    private final boolean customModel;
 
-    private ItemAsset(String texturePath, String modelParent) {
-        this.texturePath = texturePath;
-        this.modelParent = modelParent;
+    private ItemAsset(Builder builder) {
+        this.texturePath = builder.texturePath;
+        this.modelParent = builder.modelParent;
+        this.customModel = builder.customModel;
     }
 
     public String getTexturePath() { return texturePath; }
     public String getModelParent() { return modelParent; }
+
+    public boolean isCustomModel() { return customModel; }
+
+    // -------------------------------------------------------------------------
 
     public static Builder builder(String texturePath) {
         return new Builder(texturePath);
@@ -23,6 +29,7 @@ public class ItemAsset {
 
         private final String texturePath;
         private String modelParent = DEFAULT_MODEL_PARENT;
+        private boolean customModel = false;
 
         public Builder(String texturePath) {
             this.texturePath = texturePath;
@@ -33,8 +40,14 @@ public class ItemAsset {
             return this;
         }
 
+        // tells builder we have a json in mind
+        public Builder customModel() {
+            this.customModel = true;
+            return this;
+        }
+
         public ItemAsset build() {
-            return new ItemAsset(texturePath, modelParent);
+            return new ItemAsset(this);
         }
     }
 }

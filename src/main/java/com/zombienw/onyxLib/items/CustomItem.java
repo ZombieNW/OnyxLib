@@ -22,7 +22,7 @@ public class CustomItem {
     public ItemAsset getAsset() { return asset; }
 
     // Returns a copy of the base template (before PDC/CMD tagging).
-    ItemStack cloneTemplate() { return template.clone(); }
+    public ItemStack cloneTemplate() { return template.clone(); }
 
     public static Builder builder(String id) {
         return new Builder(id);

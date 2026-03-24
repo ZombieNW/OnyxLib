@@ -57,8 +57,7 @@ public class BlockEntityUtils {
     // spawns a funny item frame at center of block
     // fixed, invisible, persistent, facing up
     public ItemFrame spawnFixedFrame(Location location, String blockId, ItemStack displayItem) {
-        Location centered = blockCenter(location);
-        ItemFrame frame = location.getWorld().spawn(centered, ItemFrame.class, f -> {
+        return location.getWorld().spawn(blockCenter(location), ItemFrame.class, f -> {
             f.setInvulnerable(true);
             f.setVisible(false);
             f.setFixed(true);
@@ -66,6 +65,12 @@ public class BlockEntityUtils {
             f.setItem(displayItem);
             tagEntity(f, blockId);
         });
+    }
+
+    // rotation my beloved
+    public ItemFrame spawnFixedFrame(Location location, String blockId, ItemStack displayItem, CardinalDirection facing) {
+        ItemFrame frame = spawnFixedFrame(location, blockId, displayItem);
+        frame.setRotation(facing.toFrameRotation());
         return frame;
     }
 
