@@ -18,19 +18,19 @@ public enum CardinalDirection {
     // Direction to armor stand yaw
     public float toArmorStandYaw() {
         return switch (this) {
-            case NORTH -> 180f;
-            case EAST  -> 270f;
-            case SOUTH -> 0f;
-            case WEST  -> 90f;
+            case NORTH -> 0f;
+            case EAST  -> 90f;
+            case SOUTH -> 180f;
+            case WEST  -> 270f;
         };
     }
 
     public Rotation toFrameRotation() {
         return switch (this) {
-            case NORTH -> Rotation.CLOCKWISE_135;
-            case EAST  -> Rotation.CLOCKWISE;
-            case SOUTH -> Rotation.NONE;
-            case WEST  -> Rotation.COUNTER_CLOCKWISE;
+            case NORTH -> Rotation.NONE;
+            case EAST  -> Rotation.COUNTER_CLOCKWISE;
+            case SOUTH -> Rotation.CLOCKWISE_135;
+            case WEST  -> Rotation.CLOCKWISE;
         };
     }
 }

@@ -1,5 +1,6 @@
 package com.zombienw.onyxLib.blocks;
 
+import net.kyori.adventure.util.TriState;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.ArmorStand;
@@ -37,6 +38,7 @@ public class BlockEntityUtils {
             as.setMarker(true);
             as.setPersistent(true);
             as.setSmall(true);
+            as.setVisualFire(TriState.TRUE);
             tagEntity(as, blockId);
         });
         return stand;

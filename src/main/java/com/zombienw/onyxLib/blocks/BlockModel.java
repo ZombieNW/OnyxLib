@@ -39,7 +39,7 @@ public interface BlockModel {
 
     String ITEM_FRAME_DISPLAY = """
         "display": {
-            "gui": { "rotation": [30, 45, 0], "scale": [0.625, 0.625, 0.625] },
+            "gui": { "rotation": [30, -135, 0], "scale": [0.625, 0.625, 0.625] },
             "fixed": { "rotation": [0, 180, 0], "scale": [0.5, 0.5, 0.5] }
         }""";
 
