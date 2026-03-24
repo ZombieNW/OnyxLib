@@ -8,10 +8,13 @@ import com.zombienw.onyxLib.blocks.RegisteredBlock;
 import com.zombienw.onyxLib.core.OnyxValidation;
 import com.zombienw.onyxLib.items.CustomItem;
 import com.zombienw.onyxLib.items.ItemService;
+import com.zombienw.onyxLib.items.LootService;
 import com.zombienw.onyxLib.items.RegisteredItem;
+import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 public class OnyxNamespace {
@@ -19,16 +22,19 @@ public class OnyxNamespace {
     private final String namespace;
     private final ItemNamespace itemNamespace;
     private final BlockNamespace blockNamespace;
+    private final LootNamespace lootNamespace;
 
     public OnyxNamespace(String namespace, OnyxLib lib, JavaPlugin owningPlugin) {
         this.namespace = OnyxValidation.requireValidNamespace(namespace.toLowerCase());
         this.itemNamespace = new ItemNamespace(this.namespace, lib.items(), owningPlugin);
         this.blockNamespace = new BlockNamespace(this.namespace, lib.blocks(), owningPlugin);
+        this.lootNamespace = new LootNamespace(this.namespace, lib.loot(), owningPlugin);
     }
 
     public String getNamespace() { return namespace; }
     public ItemNamespace items() { return itemNamespace; }
     public BlockNamespace blocks() { return blockNamespace; }
+    public LootNamespace loot() { return lootNamespace; }
 
     public BlockEntityUtils blockUtils() {
         return blockNamespace.blockService.utils();
@@ -85,6 +91,28 @@ public class OnyxNamespace {
 
         public Optional<RegisteredBlock> get(String localId) {
             return blockService.get(namespace + ":" + localId);
+        }
+    }
+
+    /// Loot Namespace
+    public static class LootNamespace {
+
+        private final String namespace;
+        private final LootService lootService;
+        private final JavaPlugin owningPlugin;
+
+        LootNamespace(String namespace, LootService lootService, JavaPlugin owningPlugin) {
+            this.namespace = namespace;
+            this.lootService = lootService;
+            this.owningPlugin = owningPlugin;
+        }
+
+        public void registerDrop(Material block, ItemStack item, double chance) {
+            lootService.registerDrop(block, item, chance);
+        }
+
+        public void registerDrop(org.bukkit.entity.EntityType entity, ItemStack item, double chance) {
+            lootService.registerEntityDrop(entity, item, chance);
         }
     }
 }

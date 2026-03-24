@@ -6,6 +6,7 @@ import com.zombienw.onyxLib.core.OnyxCommand;
 import com.zombienw.onyxLib.core.OnyxNamespace;
 import com.zombienw.onyxLib.items.ItemService;
 import com.zombienw.onyxLib.core.PackGenerator;
+import com.zombienw.onyxLib.items.LootService;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -18,16 +19,21 @@ public class OnyxLib {
     private final ItemService itemService;
     private final BlockService blockService;
     private final PackGenerator packGenerator;
+    private final LootService lootService;
     private final Map<String, OnyxNamespace> namespaces = new HashMap<>();
 
     OnyxLib(OnyxLibPlugin plugin) {
         this.plugin = plugin;
         this.itemService = new ItemService(plugin);
         this.blockService = new BlockService(plugin, itemService);
+        this.lootService = new LootService();
         this.packGenerator = new PackGenerator(itemService, plugin.getDataFolder(), plugin);
 
         Bukkit.getPluginManager().registerEvents(
                 new BlockListener(blockService, itemService), plugin
+        );
+        Bukkit.getPluginManager().registerEvents(
+                lootService, plugin
         );
 
         OnyxCommand giveCommand = new OnyxCommand(itemService, packGenerator);
@@ -43,6 +49,8 @@ public class OnyxLib {
     public ItemService items() { return itemService; }
 
     public BlockService blocks() { return blockService; }
+
+    public LootService loot() { return lootService; }
 
     public OnyxNamespace namespace(String namespace, JavaPlugin owningPlugin) {
         return namespaces.computeIfAbsent(
