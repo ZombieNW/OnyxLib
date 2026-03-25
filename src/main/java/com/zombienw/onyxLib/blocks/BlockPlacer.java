@@ -2,11 +2,14 @@ package com.zombienw.onyxLib.blocks;
 
 import com.zombienw.onyxLib.items.ItemService;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Location;
 import org.bukkit.Nameable;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
-import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
@@ -35,19 +38,13 @@ public class BlockPlacer {
     }
 
     private void placeArmorStand(RegisteredBlock registered, Location location, ItemFrame triggerFrame) {
+        triggerFrame.remove();
+
+        Block block = location.getBlock();
+        block.setType(registered.getBlock().getBaseMaterial());
+
         plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
-            triggerFrame.remove();
-
-            Block block = location.getBlock();
-            block.setType(registered.getBlock().getBaseMaterial());
-
-            // Rename block if applicable (Chest, Barrel, Furnace, etc)
-            BlockState state = block.getState();
-            if (state instanceof Nameable nameable) {
-                Component itemName = itemService.create(registered.getBlock().getRegisteredItem().getItem().getId()).displayName();
-                nameable.customName(itemName);
-                state.update();
-            }
+            nameNameable(block, registered);
 
             ArmorStand stand = utils.spawnMarkerStand(location, registered.getFullId());
             utils.setHelmet(stand, createDisplayItem(registered));
@@ -57,9 +54,13 @@ public class BlockPlacer {
     private void placeRotatableArmorStand(RegisteredBlock registered, Location location, Player placer, ItemFrame triggerFrame) {
         CardinalDirection facing = CardinalDirection.fromPlayer(placer);
 
+        triggerFrame.remove();
+
+        Block block = location.getBlock();
+        block.setType(registered.getBlock().getBaseMaterial());
+
         plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
-            triggerFrame.remove();
-            location.getBlock().setType(registered.getBlock().getBaseMaterial());
+            nameNameable(block, registered);
 
             ArmorStand stand = utils.spawnMarkerStand(location, registered.getFullId(), facing);
             utils.setHelmet(stand, createDisplayItem(registered));
@@ -67,9 +68,13 @@ public class BlockPlacer {
     }
 
     private void placeItemFrame(RegisteredBlock registered, Location location, ItemFrame triggerFrame) {
+        triggerFrame.remove();
+
+        Block block = location.getBlock();
+        block.setType(registered.getBlock().getBaseMaterial());
+
         plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
-            triggerFrame.remove();
-            location.getBlock().setType(registered.getBlock().getBaseMaterial());
+            nameNameable(block, registered);
 
             utils.spawnFixedFrame(location, registered.getFullId(), createDisplayItem(registered));
         }, 1L);
@@ -78,14 +83,26 @@ public class BlockPlacer {
     private void placeRotatableItemFrame(RegisteredBlock registered, Location location, Player placer, ItemFrame triggerFrame) {
         CardinalDirection facing = CardinalDirection.fromPlayer(placer);
 
+        triggerFrame.remove();
+
+        Block block = location.getBlock();
+        block.setType(registered.getBlock().getBaseMaterial());
+
         plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
-            triggerFrame.remove();
-            location.getBlock().setType(registered.getBlock().getBaseMaterial());
+            nameNameable(block, registered);
+
             utils.spawnFixedFrame(location, registered.getFullId(), createDisplayItem(registered), facing);
         }, 1L);
     }
 
     private ItemStack createDisplayItem(RegisteredBlock registered) {
         return itemService.create(registered.getBlock().getRegisteredItem().getFullId());
+    }
+
+    private void nameNameable(Block block, RegisteredBlock registered) {
+        if (block.getState() instanceof Nameable nameable) {
+            nameable.customName(itemService.create(registered.getBlock().getRegisteredItem().getFullId()).effectiveName());
+            ((BlockState) nameable).update();
+        }
     }
 }
