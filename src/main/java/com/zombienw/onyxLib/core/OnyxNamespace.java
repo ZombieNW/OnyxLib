@@ -11,6 +11,7 @@ import com.zombienw.onyxLib.items.ItemService;
 import com.zombienw.onyxLib.items.LootService;
 import com.zombienw.onyxLib.items.RegisteredItem;
 import org.bukkit.Material;
+import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -107,12 +108,13 @@ public class OnyxNamespace {
             this.owningPlugin = owningPlugin;
         }
 
-        public void registerDrop(Material block, ItemStack item, double chance) {
-            lootService.registerDrop(block, item, chance);
+        public void registerDrop(Material block, ItemStack item, double chance, boolean lootingFortune, boolean preventSilk) {
+            lootService.registerBlockDrop(block, item, chance, lootingFortune, preventSilk);
         }
 
-        public void registerDrop(org.bukkit.entity.EntityType entity, ItemStack item, double chance) {
-            lootService.registerEntityDrop(entity, item, chance);
+        public void registerDrop(EntityType entity, ItemStack item, double chance, boolean looting) {
+            // preventSilk doesn't apply to entities, so we omit it here
+            lootService.registerEntityDrop(entity, item, chance, looting);
         }
     }
 }
