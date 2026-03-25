@@ -1,7 +1,12 @@
 package com.zombienw.onyxLib.blocks;
 
 import com.zombienw.onyxLib.items.ItemService;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
+import org.bukkit.Nameable;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
@@ -32,7 +37,17 @@ public class BlockPlacer {
     private void placeArmorStand(RegisteredBlock registered, Location location, ItemFrame triggerFrame) {
         plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
             triggerFrame.remove();
-            location.getBlock().setType(registered.getBlock().getBaseMaterial());
+
+            Block block = location.getBlock();
+            block.setType(registered.getBlock().getBaseMaterial());
+
+            // Rename block if applicable (Chest, Barrel, Furnace, etc)
+            BlockState state = block.getState();
+            if (state instanceof Nameable nameable) {
+                Component itemName = itemService.create(registered.getBlock().getRegisteredItem().getItem().getId()).displayName();
+                nameable.customName(itemName);
+                state.update();
+            }
 
             ArmorStand stand = utils.spawnMarkerStand(location, registered.getFullId());
             utils.setHelmet(stand, createDisplayItem(registered));
