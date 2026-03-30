@@ -46,6 +46,16 @@ tasks.withType(JavaCompile).configureEach {
     }
 }
 
+tasks.withType(Javadoc) {
+    destinationDir = file("web/static/javadocs")
+    
+    options {
+        encoding = 'UTF-8'
+        charSet = 'UTF-8'
+        links("https://jd.papermc.io/paper/1.21.11/")
+    }
+}
+
 processResources {
     def props = [version: version]
     inputs.properties props

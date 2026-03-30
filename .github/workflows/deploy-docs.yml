@@ -4,10 +4,9 @@ on:
   push:
     branches:
       - main
-    # Only trigger web files change (or the action)
+    # Only trigger update when i change the version number of the package but i cant actually do that so this is good enough
     paths:
-      - 'web/**'
-      - '.github/workflows/deploy-docs.yml'
+      - 'web/package.json'
 
 jobs:
   build-and-deploy:
