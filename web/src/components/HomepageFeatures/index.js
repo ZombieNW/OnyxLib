@@ -5,7 +5,7 @@ import styles from './styles.module.css';
 const FeatureList = [
   {
     title: 'Easy to Use',
-    image: require('@site/static/img/java.png').default,
+    image: require('@site/static/img/paper.png').default,
     description: (
       <>
         OnyxLib is built with Minecraft fans and developers in mind. OnyxLib and your creations are built with Java and PaperMC.
