@@ -90,12 +90,12 @@ loadScripts(document, 'script');</script>
 <section class="class-description" id="class-description">
 <dl class="notes">
 <dt>All Implemented Interfaces:</dt>
-<dd><code><a href="https://jd.papermc.io/paper/1.21.11/org/bukkit/command/CommandExecutor.html" title="class or interface in org.bukkit.command" class="external-link">CommandExecutor</a></code>, <code><a href="https://jd.papermc.io/paper/1.21.11/org/bukkit/command/TabCompleter.html" title="class or interface in org.bukkit.command" class="external-link">TabCompleter</a></code></dd>
+<dd><code>org.bukkit.command.CommandExecutor</code>, <code>org.bukkit.command.TabCompleter</code></dd>
 </dl>
 <hr>
 <div class="type-signature"><span class="modifiers">public class </span><span class="element-name type-name-label">OnyxCommand</span>
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>
-implements <a href="https://jd.papermc.io/paper/1.21.11/org/bukkit/command/CommandExecutor.html" title="class or interface in org.bukkit.command" class="external-link">CommandExecutor</a>, <a href="https://jd.papermc.io/paper/1.21.11/org/bukkit/command/TabCompleter.html" title="class or interface in org.bukkit.command" class="external-link">TabCompleter</a></span></div>
+implements org.bukkit.command.CommandExecutor, org.bukkit.command.TabCompleter</span></div>
 </section>
 <section class="summary">
 <ul class="summary-list">
@@ -125,14 +125,14 @@ implements <a href="https://jd.papermc.io/paper/1.21.11/org/bukkit/command/Comma
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#onCommand(org.bukkit.command.CommandSender,org.bukkit.command.Command,java.lang.String,java.lang.String%5B%5D)" class="member-name-link">onCommand</a><wbr>(<a href="https://jd.papermc.io/paper/1.21.11/org/bukkit/command/CommandSender.html" title="class or interface in org.bukkit.command" class="external-link">CommandSender</a>&nbsp;sender,
- <a href="https://jd.papermc.io/paper/1.21.11/org/bukkit/command/Command.html" title="class or interface in org.bukkit.command" class="external-link">Command</a>&nbsp;command,
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#onCommand(org.bukkit.command.CommandSender,org.bukkit.command.Command,java.lang.String,java.lang.String%5B%5D)" class="member-name-link">onCommand</a><wbr>(org.bukkit.command.CommandSender&nbsp;sender,
+ org.bukkit.command.Command&nbsp;command,
  <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;label,
  <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>[]&nbsp;args)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a><wbr>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#onTabComplete(org.bukkit.command.CommandSender,org.bukkit.command.Command,java.lang.String,java.lang.String%5B%5D)" class="member-name-link">onTabComplete</a><wbr>(<a href="https://jd.papermc.io/paper/1.21.11/org/bukkit/command/CommandSender.html" title="class or interface in org.bukkit.command" class="external-link">CommandSender</a>&nbsp;sender,
- <a href="https://jd.papermc.io/paper/1.21.11/org/bukkit/command/Command.html" title="class or interface in org.bukkit.command" class="external-link">Command</a>&nbsp;command,
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#onTabComplete(org.bukkit.command.CommandSender,org.bukkit.command.Command,java.lang.String,java.lang.String%5B%5D)" class="member-name-link">onTabComplete</a><wbr>(org.bukkit.command.CommandSender&nbsp;sender,
+ org.bukkit.command.Command&nbsp;command,
  <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;label,
  <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>[]&nbsp;args)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
@@ -171,26 +171,26 @@ implements <a href="https://jd.papermc.io/paper/1.21.11/org/bukkit/command/Comma
 <li>
 <section class="detail" id="onCommand(org.bukkit.command.CommandSender,org.bukkit.command.Command,java.lang.String,java.lang.String[])">
 <h3>onCommand</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">onCommand</span><wbr><span class="parameters">(<a href="https://jd.papermc.io/paper/1.21.11/org/bukkit/command/CommandSender.html" title="class or interface in org.bukkit.command" class="external-link">CommandSender</a>&nbsp;sender,
- <a href="https://jd.papermc.io/paper/1.21.11/org/bukkit/command/Command.html" title="class or interface in org.bukkit.command" class="external-link">Command</a>&nbsp;command,
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">onCommand</span><wbr><span class="parameters">(org.bukkit.command.CommandSender&nbsp;sender,
+ org.bukkit.command.Command&nbsp;command,
  <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;label,
  <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>[]&nbsp;args)</span></div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="https://jd.papermc.io/paper/1.21.11/org/bukkit/command/CommandExecutor.html#onCommand(org.bukkit.command.CommandSender,org.bukkit.command.Command,java.lang.String,java.lang.String%5B%5D)" title="class or interface in org.bukkit.command" class="external-link">onCommand</a></code>&nbsp;in interface&nbsp;<code><a href="https://jd.papermc.io/paper/1.21.11/org/bukkit/command/CommandExecutor.html" title="class or interface in org.bukkit.command" class="external-link">CommandExecutor</a></code></dd>
+<dd><code>onCommand</code>&nbsp;in interface&nbsp;<code>org.bukkit.command.CommandExecutor</code></dd>
 </dl>
 </section>
 </li>
 <li>
 <section class="detail" id="onTabComplete(org.bukkit.command.CommandSender,org.bukkit.command.Command,java.lang.String,java.lang.String[])">
 <h3>onTabComplete</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;</span>&nbsp;<span class="element-name">onTabComplete</span><wbr><span class="parameters">(<a href="https://jd.papermc.io/paper/1.21.11/org/bukkit/command/CommandSender.html" title="class or interface in org.bukkit.command" class="external-link">CommandSender</a>&nbsp;sender,
- <a href="https://jd.papermc.io/paper/1.21.11/org/bukkit/command/Command.html" title="class or interface in org.bukkit.command" class="external-link">Command</a>&nbsp;command,
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;</span>&nbsp;<span class="element-name">onTabComplete</span><wbr><span class="parameters">(org.bukkit.command.CommandSender&nbsp;sender,
+ org.bukkit.command.Command&nbsp;command,
  <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;label,
  <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>[]&nbsp;args)</span></div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="https://jd.papermc.io/paper/1.21.11/org/bukkit/command/TabCompleter.html#onTabComplete(org.bukkit.command.CommandSender,org.bukkit.command.Command,java.lang.String,java.lang.String%5B%5D)" title="class or interface in org.bukkit.command" class="external-link">onTabComplete</a></code>&nbsp;in interface&nbsp;<code><a href="https://jd.papermc.io/paper/1.21.11/org/bukkit/command/TabCompleter.html" title="class or interface in org.bukkit.command" class="external-link">TabCompleter</a></code></dd>
+<dd><code>onTabComplete</code>&nbsp;in interface&nbsp;<code>org.bukkit.command.TabCompleter</code></dd>
 </dl>
 </section>
 </li>
