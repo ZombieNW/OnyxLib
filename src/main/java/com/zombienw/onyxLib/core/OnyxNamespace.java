@@ -1,120 +1,176 @@
-package com.zombienw.onyxLib.core;
+package com.zombienw.onyxlib.core;
 
-import com.zombienw.onyxLib.OnyxLib;
-import com.zombienw.onyxLib.blocks.BlockEntityUtils;
-import com.zombienw.onyxLib.blocks.BlockService;
-import com.zombienw.onyxLib.blocks.CustomBlock;
-import com.zombienw.onyxLib.blocks.RegisteredBlock;
-import com.zombienw.onyxLib.core.OnyxValidation;
-import com.zombienw.onyxLib.items.CustomItem;
-import com.zombienw.onyxLib.items.ItemService;
-import com.zombienw.onyxLib.items.LootService;
-import com.zombienw.onyxLib.items.RegisteredItem;
-import org.bukkit.Material;
-import org.bukkit.entity.EntityType;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.ArrayList;
-import java.util.Optional;
+/**
+ * A namespace scopes all content registered by a plugin.
+ *
+ * <p> Every registered item, block, or other content type has a namespaced key in the form
+ * {@code namespace:content_id} (example {@code "myplugin:strawberry"}).
+ *
+ * <p> Namespace creation is locked after {@code #freeze()} is called when OnyxLib detects
+ * the owning plugin is done with {@code onEnable()}. Then an error is thrown.
+ *
+ * <h3>Usage</h3>
+ * <pre>{@code
+ * OnyxNamespace ns = OnyxLib.namespace("myplugin", this);
+ *
+ * ns.item("strawberry")
+ *     .baseItem(Material.APPLE)
+ *     .displayName("Strawberry")
+ *     .register();
+ *
+ * ns.block("marble")
+ *     .baseBlock(Material.STONE)
+ *     .display(d -> d.allAround("blocks/marble.png"))
+ *     .register();
+ * }</pre>
+ */
+public final class OnyxNamespace {
 
-public class OnyxNamespace {
+    private final String id;
+    private final JavaPlugin plugin;
+    private final OnyxRegistry registry;
 
-    private final String namespace;
-    private final ItemNamespace itemNamespace;
-    private final BlockNamespace blockNamespace;
-    private final LootNamespace lootNamespace;
+    private boolean frozen = false;
 
-    public OnyxNamespace(String namespace, OnyxLib lib, JavaPlugin owningPlugin) {
-        this.namespace = OnyxValidation.requireValidNamespace(namespace.toLowerCase());
-        this.itemNamespace = new ItemNamespace(this.namespace, lib.items(), owningPlugin);
-        this.blockNamespace = new BlockNamespace(this.namespace, lib.blocks(), owningPlugin);
-        this.lootNamespace = new LootNamespace(this.namespace, lib.loot(), owningPlugin);
+    /**
+     * Package-private obtain instances via {@link OnyxLib#namespace(String, JavaPlugin)}.
+     */
+    OnyxNamespace(String id, JavaPlugin plugin) {
+        this.id = id;
+        this.plugin = plugin;
+        this.registry = new OnyxRegistry(this);
     }
 
-    public String getNamespace() { return namespace; }
-    public ItemNamespace items() { return itemNamespace; }
-    public BlockNamespace blocks() { return blockNamespace; }
-    public LootNamespace loot() { return lootNamespace; }
+    // Content Builders
 
-    public BlockEntityUtils blockUtils() {
-        return blockNamespace.blockService.utils();
+    /**
+     * Begins building a new item with the given id.
+     *
+     * <p> The returned {@link ItemBuilder} is a fluent builder. Call {@link ItemBuilder#register()}
+     * when done to add the item to the namespace.
+     *
+     * @param id     The item id; namespaced as {@code namespace:id}
+     * @return a new {@link ItemBuilder}
+     * @throws IllegalStateException if this namespace is frozen
+     * @throws IllegalArgumentException if {@code id} is invalid
+     */
+    public ItemBuilder item(String id) {
+        assertNotFrozen();
+        validateId(id);
+        return new ItemBuilder(this, id);
     }
 
-    /// Item Namespace
+    /**
+     * Begins building a new block with the given id.
+     *
+     * <p> The returned {@link BlockBuilder} is a fluent builder. Call {@link BlockBuilder#register()}
+     * when done to commit the block to this namespace.
+     *
+     * @param id    The block id; namespaced as {@code namespace:id}
+     * @return a new {@link BlockBuilder}
+     * @throws IllegalStateException if this namespace is frozen
+     * @throws IllegalArgumentException if {@code id} is invalid
+     */
+    public BlockBuilder block(String id) {
+        assertNotFrozen();
+        validateId(id);
+        return new BlockBuilder(this, id);
+    }
 
-    public static class ItemNamespace {
+    // TODO: ns.recipe()
+    // TODO: ns.lootTable()
 
-        private final String namespace;
-        private final ItemService itemService;
-        private final JavaPlugin owningPlugin;
+    // Accessors
 
-        ItemNamespace(String namespace, ItemService itemService, JavaPlugin owningPlugin) {
-            this.namespace = namespace;
-            this.itemService = itemService;
-            this.owningPlugin = owningPlugin;
-        }
+    /**
+     * Returns the namespace id (e.g. {@code "myplugin"}).
+     *
+     * @return namespace id
+     */
+    public String id() {
+        return id;
+    }
 
-        public RegisteredItem register(CustomItem item) {
-            return itemService.register(namespace, item, owningPlugin);
-        }
+    /**
+     * Returns the plugin that owns this namespace.
+     *
+     * @return owning plugin
+     */
+    public JavaPlugin plugin() {
+        return plugin;
+    }
 
-        public ItemStack create(String localId) {
-            return itemService.create(namespace + ":" + localId);
-        }
+    /**
+     * Returns the content registry for this namespace.
+     *
+     * @return registry
+     */
+    public OnyxRegistry registry() {
+        return registry;
+    }
 
-        public ItemStack create(String localId, int amount) {
-            return itemService.create(namespace + ":" + localId, amount);
-        }
+    /**
+     * Returns {@code true} if this namespace has been frozen (no more registrations allowed).
+     *
+     * @return frozen state
+     */
+    public boolean isFrozen() {
+        return frozen;
+    }
 
-        public Optional<RegisteredItem> get(String localId) {
-            return itemService.get(namespace + ":" + localId);
+    /**
+     * Produces the full namespaced key string for a content id.
+     *
+     * <p>Example {@code key("strawberry")} -> {@code "myplugin:strawberry"}
+     *
+     * @param contentId the un-namespaced content id
+     * @return namespaced key string
+     */
+    public String key(String contentId) {
+        return id + ":" + contentId;
+    }
+
+    // Lifecycle
+
+    /**
+     * Freezes the namespace so no more content can be added.
+     *
+     * <p>OnyxLib calls this automatically after the owning pluggin is done enabling.
+     */
+    public void freeze() {
+        this.frozen = true;
+        OnyxLib.logger().info(
+            "[OnyxLib] Namespace '" +
+                id +
+                "' frozen with " +
+                registry.itemCount() +
+                " item(s) and " +
+                registry.blockCount() +
+                " block(s)."
+        );
+    }
+
+    // Helpers
+
+    void assertNotFrozen() {
+        if (frozen) {
+            throw new IllegalStateException(
+                "Namespace '" +
+                    id +
+                    "' is frozen — content may not be registered after onEnable()."
+            );
         }
     }
 
-    /// Block Namespace
-
-    public static class BlockNamespace {
-
-        private final String namespace;
-        private final BlockService blockService;
-        private final JavaPlugin owningPlugin;
-
-        BlockNamespace(String namespace, BlockService blockService, JavaPlugin owningPlugin) {
-            this.namespace = namespace;
-            this.blockService = blockService;
-            this.owningPlugin = owningPlugin;
-        }
-
-        public RegisteredBlock register(CustomBlock block) {
-            return blockService.register(namespace, block, owningPlugin);
-        }
-
-        public Optional<RegisteredBlock> get(String localId) {
-            return blockService.get(namespace + ":" + localId);
-        }
-    }
-
-    /// Loot Namespace
-    public static class LootNamespace {
-
-        private final String namespace;
-        private final LootService lootService;
-        private final JavaPlugin owningPlugin;
-
-        LootNamespace(String namespace, LootService lootService, JavaPlugin owningPlugin) {
-            this.namespace = namespace;
-            this.lootService = lootService;
-            this.owningPlugin = owningPlugin;
-        }
-
-        public void registerDrop(Material block, ItemStack item, double chance, boolean lootingFortune, boolean preventSilk) {
-            lootService.registerBlockDrop(block, item, chance, lootingFortune, preventSilk);
-        }
-
-        public void registerDrop(EntityType entity, ItemStack item, double chance, boolean looting) {
-            // preventSilk doesn't apply to entities, so we omit it here
-            lootService.registerEntityDrop(entity, item, chance, looting);
+    private static void validateId(String id) {
+        if (id == null || !id.matches("[a-z0-9_]+")) {
+            throw new IllegalArgumentException(
+                "Content id '" +
+                    id +
+                    "' must be lowercase alphanumeric with underscores only."
+            );
         }
     }
 }
