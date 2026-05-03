@@ -1,0 +1,17 @@
+name: OnyxLib
+version: '1.0-SNAPSHOT'
+main: com.zombienw.onyxLib.OnyxLibPlugin
+api-version: '1.21'
+load: STARTUP
+
+commands:
+  onyx:
+    description: OnyxLib admin commands
+    usage: /onyx <give|generatepack>
+    permission: onyxlib.admin
+    permission-message: You don't have permission to use OnyxLib commands.
+
+permissions:
+  onyxlib.admin:
+    description: Access to all OnyxLib admin commands
+    default: op
