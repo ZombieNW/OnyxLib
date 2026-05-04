@@ -49,7 +49,9 @@ public final class OnyxLib {
      */
     public static OnyxNamespace namespace(String id, JavaPlugin plugin) {
         validateId(id);
-        return NAMESPACES.computeIfAbsent(id, k -> new OnyxNamespace(plugin));
+        return NAMESPACES.computeIfAbsent(id, k ->
+            new OnyxNamespace(id, plugin)
+        );
     }
 
     /**

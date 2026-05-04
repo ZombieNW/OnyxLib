@@ -49,7 +49,7 @@ public final class BlockBuilder {
     private Consumer<BlockInteractEvent> onInteract;
 
     /** Package-private — created by {@link OnyxNamespace#block(String)}. */
-    BlockBuilder(OnyxNamespace namespace, String id) {
+    public BlockBuilder(OnyxNamespace namespace, String id) {
         this.namespace = namespace;
         this.id = id;
     }

@@ -69,7 +69,7 @@ public final class ItemBuilder {
     private Consumer<ItemHitEntityEvent> onHitEntity;
 
     /** Package-private — created by {@link OnyxNamespace#item(String)}. */
-    ItemBuilder(OnyxNamespace namespace, String id) {
+    public ItemBuilder(OnyxNamespace namespace, String id) {
         this.namespace = namespace;
         this.id = id;
     }

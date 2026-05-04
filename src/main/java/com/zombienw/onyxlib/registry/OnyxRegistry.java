@@ -1,6 +1,13 @@
 package com.zombienw.onyxlib.registry;
 
+import com.zombienw.onyxlib.block.OnyxBlock;
 import com.zombienw.onyxlib.core.OnyxNamespace;
+import com.zombienw.onyxlib.item.OnyxItem;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * Stores content registered by a {@link OnyxNamespace}
