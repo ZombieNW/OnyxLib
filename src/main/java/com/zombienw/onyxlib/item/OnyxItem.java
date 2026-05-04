@@ -2,11 +2,17 @@ package com.zombienw.onyxlib.item;
 
 import com.zombienw.onyxlib.core.OnyxNamespace;
 import com.zombienw.onyxlib.event.item.*;
+import java.util.List;
 import java.util.function.Consumer;
 import javax.annotation.Nullable;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.components.CustomModelDataComponent;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Descriptor for an item registered inside an {@link OnyxNamespace}.
@@ -106,14 +112,60 @@ public final class OnyxItem {
      * @return a new ItemStack
      */
     public ItemStack create(int amount) {
-        // TODO: Build the real ItemStack from baseMaterial/baseItemStack
-        // TODO: Apply custom model data (from texture/model path -> resource-pack int)
-        // TODO: Apply displayName via ItemMeta
-        // TODO: Apply itemMetaConsumer
-        // TODO: Stamp PersistentDataContainer with namespaced key so events can identify this item
-        throw new UnsupportedOperationException(
-            "TODO: implement OnyxItem#create()"
+        ItemStack itemStack;
+
+        // override pre-made itemstack
+        if (baseItemStack != null) {
+            itemStack = baseItemStack().clone();
+            itemStack.setAmount(amount);
+        } else {
+            Material material =
+                baseMaterial != null ? baseMaterial : Material.PAPER;
+            itemStack = new ItemStack(material, amount);
+        }
+
+        ItemMeta meta = itemStack.getItemMeta();
+        if (meta == null) return itemStack; // just to cover our ass
+
+        // stamp PDC namespaced key on the item
+        org.bukkit.NamespacedKey identityKey = new org.bukkit.NamespacedKey(
+            namespace.id(),
+            "id"
         );
+        meta
+            .getPersistentDataContainer()
+            .set(
+                identityKey,
+                org.bukkit.persistence.PersistentDataType.STRING,
+                id
+            );
+
+        // Display Name
+        if (displayName != null) {
+            meta.displayName(
+                Component.text(displayName).decoration(
+                    TextDecoration.ITALIC,
+                    false
+                )
+            );
+        }
+
+        // Model Data
+        if (texture != null || model != null) {
+            CustomModelDataComponent customModelData =
+                meta.getCustomModelDataComponent();
+            String modelPath = namespace.id() + ":item/" + id;
+            customModelData.setStrings(List.of(modelPath));
+            meta.setCustomModelDataComponent(customModelData);
+        }
+
+        // Extra Meta
+        if (itemMetaConsumer != null) {
+            itemMetaConsumer.accept(meta);
+        }
+
+        itemStack.setItemMeta(meta);
+        return itemStack;
     }
 
     /**
