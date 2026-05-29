@@ -19,8 +19,7 @@ import org.bukkit.plugin.java.JavaPlugin;
  */
 public final class OnyxLib {
 
-    private static final Map<String, OnyxNamespace> NAMESPACES =
-        new HashMap<>();
+    private static final Map<String, OnyxNamespace> NAMESPACES = new HashMap<>();
     private static Logger logger;
 
     private OnyxLib() {}
@@ -28,11 +27,10 @@ public final class OnyxLib {
     /**
      * Initializes OnyxLib. Call this from your plugin's {@code onLoad()} or {@code onEnable()}.
      *
-     * @param plugin    the owning pluggin; used for logging and events
+     * @param plugin    the owning plugin; used for logging and events
      */
     public static void init(JavaPlugin plugin) {
         logger = plugin.getLogger();
-        // TODO: register listeners
         logger.info("[OnyxLib] Initialized.");
     }
 
@@ -50,7 +48,7 @@ public final class OnyxLib {
     public static OnyxNamespace namespace(String id, JavaPlugin plugin) {
         validateId(id);
         return NAMESPACES.computeIfAbsent(id, k ->
-            new OnyxNamespace(id, plugin)
+            new OnyxNamespace(k, plugin)
         );
     }
 
@@ -77,9 +75,7 @@ public final class OnyxLib {
     private static void validateId(String id) {
         if (id == null || !id.matches("[a-z0-9_]+")) {
             throw new IllegalArgumentException(
-                "Namespace id '" +
-                    id +
-                    "' must be lowercase alphanumeric with underscores only."
+                "Namespace id '" + id + "' must be lowercase alphanumeric with underscores only."
             );
         }
     }

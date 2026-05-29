@@ -19,10 +19,10 @@ public final class OnyxRegistry {
 
     private final OnyxNamespace namespace;
 
-    /** Registered custom items, keyed on un-namespaced id'. */
+    /** Registered custom items, keyed on un-namespaced id. */
     private final Map<String, OnyxItem> items = new LinkedHashMap<>();
 
-    /** Registered custom blocks, keyed on un-namespaced id'. */
+    /** Registered custom blocks, keyed on un-namespaced id. */
     private final Map<String, OnyxBlock> blocks = new LinkedHashMap<>();
 
     // TODO: recipes

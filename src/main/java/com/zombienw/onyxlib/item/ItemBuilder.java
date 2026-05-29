@@ -4,6 +4,9 @@ import com.zombienw.onyxlib.core.OnyxNamespace;
 import com.zombienw.onyxlib.event.item.*;
 import java.util.function.Consumer;
 import javax.annotation.Nullable;
+
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
