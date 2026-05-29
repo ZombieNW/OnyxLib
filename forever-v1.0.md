@@ -1,10 +1,12 @@
-# OnyxLib Design Reference -- v1.0
+# OnyxLib Design Reference -- v1.1
 How OnyxLib should always look and feel.
 
 ## Philosophy
 OnyxLib is a framework for creating custom content using PaperMC. All items map to real pre-existing objects. Items are backed by `Material`'s, Blocks are backed by placed vanilla blocks with display entities on top.
 
 OnyxLib is meant to be declarative-first. End-developers are focused on "what" they want to create, less of "how" it's created. Though, developers are given full control. This is not a full abstraction layer. The process of composition is preferred over top-level features.
+
+Developer friendly, javadocs wherever necessary.
 
 ## Core Concepts
 
