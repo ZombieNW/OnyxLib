@@ -13,7 +13,7 @@ OnyxLib abstracts asset management and overhead so end-developers can focus on w
 ---
 
 ### Namespaces
-Namespaces are the root containers and registries for all custom content. They handle scoping, automatic ID tracking,a nd serve as the source of truth for the resource pack generation pipeline.
+Namespaces are the root containers and registries for all custom content. They handle scoping, automatic ID tracking, and serve as the source of truth for the resource pack generation pipeline.
 ```java
 OnyxNamespace ns = OnyxLib.namespace("myplugin");
 ```
