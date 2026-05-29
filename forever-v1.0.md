@@ -22,7 +22,7 @@ Registration becomes immutable once the server plugin is fully enabled.
 ---
 
 ### Items
-An item is a declaratively configured wrapper around a vanilla base `Material`. OnyxLib bridges the gap between the code and resource pack assets by mapping textures to sequentially generated model data IDs.
+An item is a declaratively configured wrapper around a vanilla base `Material`.
 ```java
 ns.item("strawberry")
     .displayName("Strawberry")
