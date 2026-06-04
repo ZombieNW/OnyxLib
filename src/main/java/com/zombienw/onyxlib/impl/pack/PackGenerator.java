@@ -4,7 +4,6 @@ import com.zombienw.onyxlib.OnyxPlugin;
 import com.zombienw.onyxlib.impl.item.OnyxItemImpl;
 import com.zombienw.onyxlib.impl.registry.NamespaceRegistry;
 import com.zombienw.onyxlib.impl.registry.OnyxNamespaceImpl;
-import org.bukkit.Material;
 import org.bukkit.plugin.Plugin;
 
 import java.io.*;
@@ -14,8 +13,6 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -129,51 +126,28 @@ public class PackGenerator {
     }
 
     private void writeItemDefinitions(Path root, List<OnyxItemImpl> items) throws IOException {
-        Map<Material, List<OnyxItemImpl>> byMaterial = items.stream()
-                .collect(Collectors.groupingBy(OnyxItemImpl::getBaseMaterial));
+        for (OnyxItemImpl item : items) {
+            String namespace = item.getKey().getNamespace();
+            String itemId = item.getId();
 
-        for (var entry : byMaterial.entrySet()) {
-            String materialKey = entry.getKey().getKey().getKey();
-            List<OnyxItemImpl> group = entry.getValue();
-            group.sort(Comparator.comparing(item -> item.getKey().toString()));
-
-            Path defPath = root.resolve("assets/minecraft/items/" + materialKey + ".json");
+            // Creates: assets/<namespace>/items/<id>.json
+            Path defPath = root.resolve("assets/" + namespace + "/items/" + itemId + ".json");
             Files.createDirectories(defPath.getParent());
-            Files.writeString(defPath, buildItemDefinitionJson(materialKey, group));
+
+            // Points to the visual model created in writeModelFiles()
+            String modelRef = namespace + ":item/" + itemId;
+
+            String itemJson = """
+                {
+                  "model": {
+                    "type": "minecraft:model",
+                    "model": "%s"
+                  }
+                }
+                """.formatted(modelRef);
+
+            Files.writeString(defPath, itemJson);
         }
-    }
-
-    private String buildItemDefinitionJson(String materialKey, List<OnyxItemImpl> items) {
-        StringBuilder cases = new StringBuilder();
-
-        for (int i = 0; i < items.size(); i++) {
-            OnyxItemImpl item = items.get(i);
-            String modelRef = item.getKey().toString(); // e.g., "myplugin:strawberry"
-
-            cases.append("        {\n")
-                    .append("          \"when\": \"").append(modelRef).append("\",\n")
-                    .append("          \"model\": { \"type\": \"minecraft:model\", \"model\": \"").append(modelRef).append("\" }\n")
-                    .append("        }");
-
-            if (i < items.size() - 1) cases.append(",");
-            cases.append("\n");
-        }
-
-        return """
-            {
-              "model": {
-                "type": "minecraft:select",
-                "property": "minecraft:custom_model_data",
-                "index": 0,
-                "fallback": {
-                  "type": "minecraft:model",
-                  "model": "minecraft:item/%s"
-                },
-                "cases": [
-            %s    ]
-              }
-            }
-            """.formatted(materialKey, cases.toString());
     }
 
     // fuck
