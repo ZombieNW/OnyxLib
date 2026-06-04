@@ -1,6 +1,6 @@
 name: OnyxLib
 version: "1.0"
-main: com.zombienw.onyxLib.core.OnyxLib
+main: com.zombienw.onyxlib.OnyxPlugin
 api-version: "26.1"
 load: STARTUP
 
