@@ -14,21 +14,23 @@ public class OnyxItemImpl implements OnyxItem {
 
     private final String id;
     private final NamespacedKey pdcKey;
+    private final NamespacedKey itemKey;
 
     private Material baseMaterial;
     private Component displayName;
     private String texturePath;
     private Consumer<ItemMeta> metaConsumer;
 
-    public OnyxItemImpl(String id, NamespacedKey pdcKey) {
+    public OnyxItemImpl(String id, NamespacedKey itemKey, NamespacedKey pdcKey) {
         this.id = id;
+        this.itemKey = itemKey;
         this.pdcKey = pdcKey;
     }
 
     public String getId() { return id; }
     public String getTexturePath() { return texturePath; }
     public Material getBaseMaterial() { return baseMaterial; }
-    public NamespacedKey getKey() { return pdcKey; }
+    public NamespacedKey getKey() { return itemKey; }
 
     @Override
     public OnyxItem baseItem(Material material) {
@@ -80,7 +82,7 @@ public class OnyxItemImpl implements OnyxItem {
                 meta.displayName(this.displayName);
             }
 
-            meta.setItemModel(this.pdcKey);
+            meta.setItemModel(this.itemKey);
             meta.getPersistentDataContainer().set(this.pdcKey, PersistentDataType.STRING, this.id);
 
             if (this.metaConsumer != null) {

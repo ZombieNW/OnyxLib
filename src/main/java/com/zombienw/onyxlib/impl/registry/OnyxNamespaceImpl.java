@@ -42,8 +42,9 @@ public class OnyxNamespaceImpl implements OnyxNamespace {
         }
 
         return this.registeredItems.computeIfAbsent(id, k -> {
-           NamespacedKey modelKey = new NamespacedKey(this.plugin, id);
-           return new OnyxItemImpl(id, this.itemPdcKey);
+            NamespacedKey itemKey = new NamespacedKey(this.plugin, id);
+
+            return new OnyxItemImpl(id, itemKey, this.itemPdcKey);
         });
     }
 
