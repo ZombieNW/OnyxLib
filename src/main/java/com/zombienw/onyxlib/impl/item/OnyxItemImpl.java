@@ -2,6 +2,7 @@ package com.zombienw.onyxlib.impl.item;
 
 import com.zombienw.onyxlib.api.item.OnyxItem;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
@@ -40,7 +41,8 @@ public class OnyxItemImpl implements OnyxItem {
 
     @Override
     public OnyxItem displayName(String name) {
-        this.displayName = Component.text(name);
+        this.displayName = Component.text(name)
+                .decoration(TextDecoration.ITALIC, false);
         return this;
     }
 
