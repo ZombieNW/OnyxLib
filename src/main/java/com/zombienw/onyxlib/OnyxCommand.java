@@ -4,7 +4,8 @@ import com.zombienw.onyxlib.impl.item.OnyxItemImpl;
 import com.zombienw.onyxlib.impl.pack.PackGenerator;
 import com.zombienw.onyxlib.impl.registry.NamespaceRegistry;
 import com.zombienw.onyxlib.impl.registry.OnyxNamespaceImpl;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.NamespacedKey;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -28,7 +29,7 @@ public class OnyxCommand implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(@NonNull CommandSender sender, @NonNull Command command, @NonNull String label, String[] args) {
         if (args.length == 0) {
-            sender.sendMessage(ChatColor.RED + "Usage: /onyx <give|generatePack>");
+            sender.sendMessage(Component.text("Usage: /onyx <give|generatePack>", NamedTextColor.RED));
             return true;
         }
 
@@ -36,20 +37,20 @@ public class OnyxCommand implements CommandExecutor, TabCompleter {
 
         if (subCommand.equals("generatepack")) {
             if (!sender.hasPermission("onyxlib.admin")) {
-                sender.sendMessage(ChatColor.RED + "No permission.");
+                sender.sendMessage(Component.text("No permission.", NamedTextColor.RED));
                 return true;
             }
 
-            sender.sendMessage(ChatColor.YELLOW + "Starting pack generation...");
+            sender.sendMessage(Component.text("Starting pack generation...", NamedTextColor.YELLOW));
 
             // Run asynchronously to prevent freezing the server during heavy IO operations
             plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
                 try {
                     PackGenerator generator = new PackGenerator(plugin);
                     String result = generator.generate();
-                    sender.sendMessage(ChatColor.GREEN + result);
+                    sender.sendMessage(Component.text(result, NamedTextColor.GREEN));
                 } catch (Exception e) {
-                    sender.sendMessage(ChatColor.RED + "Pack generation failed! Check console.");
+                    sender.sendMessage(Component.text("Pack generation failed! Check console.", NamedTextColor.RED));
                     e.printStackTrace();
                 }
             });
@@ -58,29 +59,29 @@ public class OnyxCommand implements CommandExecutor, TabCompleter {
 
         if (subCommand.equals("give")) {
             if (!sender.hasPermission("onyxlib.admin")) {
-                sender.sendMessage(ChatColor.RED + "No permission.");
+                sender.sendMessage(Component.text("No permission.", NamedTextColor.RED));
                 return true;
             }
 
             if (!(sender instanceof Player player)) {
-                sender.sendMessage(ChatColor.RED + "Only players can receive items.");
+                sender.sendMessage(Component.text("Only players can receive items.", NamedTextColor.RED));
                 return true;
             }
 
             if (args.length < 2) {
-                sender.sendMessage(ChatColor.RED + "Usage: /onyx give <namespace:item_id> [amount]");
+                sender.sendMessage(Component.text("Usage: /onyx give <namespace:item_id> [amount]", NamedTextColor.RED));
                 return true;
             }
 
             NamespacedKey key = NamespacedKey.fromString(args[1]);
             if (key == null) {
-                sender.sendMessage(ChatColor.RED + "Invalid item key format.");
+                sender.sendMessage(Component.text("Invalid item key format.", NamedTextColor.RED));
                 return true;
             }
 
             OnyxItemImpl item = NamespaceRegistry.getItem(key);
             if (item == null) {
-                sender.sendMessage(ChatColor.RED + "Unknown OnyxLib item: " + key);
+                sender.sendMessage(Component.text("Unknown OnyxLib item: " + key, NamedTextColor.RED));
                 return true;
             }
 
@@ -93,7 +94,7 @@ public class OnyxCommand implements CommandExecutor, TabCompleter {
 
             ItemStack stack = item.create(amount);
             player.getInventory().addItem(stack);
-            player.sendMessage(ChatColor.GREEN + "Given " + amount + "x " + key);
+            sender.sendMessage(Component.text("Given " + amount + " " + key, NamedTextColor.GREEN));
             return true;
         }
 
