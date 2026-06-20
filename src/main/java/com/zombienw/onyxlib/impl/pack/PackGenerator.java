@@ -150,7 +150,7 @@ public class PackGenerator {
         }
     }
 
-    // fuck
+    // zip temp directory into output file
     private void zipDirectory(Path source, Path destZip) throws IOException {
         Files.deleteIfExists(destZip);
         Files.createDirectories(destZip.getParent());
