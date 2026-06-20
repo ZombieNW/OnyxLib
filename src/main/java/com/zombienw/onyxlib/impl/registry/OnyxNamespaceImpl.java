@@ -48,15 +48,27 @@ public class OnyxNamespaceImpl implements OnyxNamespace {
         });
     }
 
-    @Override
     public void lock() {
         if (this.isLocked) return;
         this.isLocked = true;
 
-        // warn about incorrectly registered items
+        // validate items
         for (OnyxItemImpl item : registeredItems.values()) {
+            // check base material
             if (item.getBaseMaterial() == null) {
                 plugin.getLogger().warning("Item '" + item.getId() + "' was registered but never assigned a base material. It will be unusable.");
+            }
+
+            // check that textures exist
+            if (item.getTexturePath() != null) {
+                String resourcePath = "assets/" + item.getKey().getNamespace() +
+                        "/textures/" + item.getTexturePath() + ".png";
+                if (plugin.getResource(resourcePath) == null) {
+                    plugin.getLogger().warning(
+                            "Item '" + item.getId() + "' declares texture '" + item.getTexturePath() +
+                                    "' but no file was found at: " + resourcePath
+                    );
+                }
             }
         }
     }
