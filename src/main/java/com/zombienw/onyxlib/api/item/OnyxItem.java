@@ -32,8 +32,12 @@ public interface OnyxItem {
     OnyxItem displayName(Component component);
 
     /**
-     * Sets the relative path to the texture file for resource pack generation.
-     * @param path The path (e.g., "items/strawberry.png")
+     * Sets the relative path to the texture file, WITHOUT the .png extension.
+     * The path is relative to assets/<namespace>/textures/ in your plugin jar.
+     * <p>
+     * Example: texture("items/strawberry") -> assets/myplugin/textures/items/strawberry.png
+     *
+     * @param path The path without extension (e.g., "items/strawberry")
      * @return This OnyxItem instance.
      */
     OnyxItem texture(String path);

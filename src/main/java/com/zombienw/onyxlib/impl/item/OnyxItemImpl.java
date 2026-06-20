@@ -54,6 +54,14 @@ public class OnyxItemImpl implements OnyxItem {
 
     @Override
     public OnyxItem texture(String path) {
+        // check for dev adding extension
+        if (path.endsWith(".png")) {
+            throw new IllegalArgumentException(
+                    "Texture path for item '" + id + "' must not include the .png extension. " +
+                            "Got: \"" + path + "\", expected: \"" + path.substring(0, path.length() - 4) + "\""
+            );
+        }
+
         this.texturePath = path;
         return this;
     }
