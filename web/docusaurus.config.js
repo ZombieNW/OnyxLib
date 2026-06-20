@@ -65,8 +65,8 @@ const config = {
                 },
                 items: [
                     {
-                        type: "docSidebar",
-                        sidebarId: "introSidebar",
+                        type: "doc",
+                        docId: "getting-started",
                         position: "left",
                         label: "Getting Started",
                     },
@@ -122,6 +122,7 @@ const config = {
             prism: {
                 theme: prismThemes.github,
                 darkTheme: prismThemes.dracula,
+                additionalLanguages: ["java"],
             },
         }),
 };
