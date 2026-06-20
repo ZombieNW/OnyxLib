@@ -21,9 +21,6 @@ dependencies {
 
 tasks {
     runServer {
-        // Configure the Minecraft version for our task.
-        // This is the only required configuration besides applying the plugin.
-        // Your plugin's jar (or shadowJar if present) will be used automatically.
         minecraftVersion("26.1.2")
     }
 }
@@ -74,6 +71,23 @@ publishing {
     publications {
         mavenJava(MavenPublication) {
             from components.java
+
+            // These let dependents reference your artifact as:
+            // com.zombienw:onyxlib:1.0
+            groupId = 'com.zombienw'
+            artifactId = 'onyxlib'
+            version = version
+        }
+    }
+
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/ZombieNW/OnyxLib")
+            credentials {
+                username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR")
+                password = project.findProperty("gpr.token") ?: System.getenv("GITHUB_TOKEN")
+            }
         }
     }
 }
