@@ -14,9 +14,12 @@ This page will walk you through setting up OnyxLib, creating your first item, an
 
 ---
 
+## 0. Download OnyxLib
+[Download from GitHub](https://github.com/ZombieNW/OnyxLib/releases/latest)
+
 ## 1. Adding OnyxLib to Your Plugin
 
-Before writing code, install the core OnyxLib plugin on your server. Then, add OnyxLib as a dependency to your plugin's source code.
+Install the core OnyxLib plugin on your server. Then, add OnyxLib as a dependency to your plugin's source code. *May I recommend using JitPack with OnyxLib's GitHub.*
 
 ### API Usage
 
