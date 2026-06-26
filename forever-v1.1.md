@@ -1,109 +1,43 @@
 # OnyxLib Design Reference -- v1.1
-How OnyxLib looks, feels, and operates.
+
+OnyxLib has not changed, only improved.
 
 ## Philosophy
 
-OnyxLib is a framework for creating custom content using PaperMC. All items map to real pre-existing objects. Items are backed by `Material`'s, Blocks are backed by placed vanilla blocks with display entities on top.
+OnyxLib retains its core philosophy: declarative-first configuration that favors composition over restrictive framework abstractions.
 
-OnyxLib is meant to be declarative-first. End-developers are focused on "what" they want to create, less of "how" it's created. Though, developers are given full control. This is not a full abstraction layer. The process of composition is preferred over top-level features.
+v1.1 expands this architecture to support an event-based custom block system utilizing vanilla base blocks overlaid with `ItemDisplay` entities, while keeping the v1.0 custom item system intact.
 
-Developer friendly, javadocs wherever necessary.
-
-## Core Concepts
-
-### Namespaces
-Namespaces are the root containers for all content.
-```java
-OnyxNamespace ns = OnyxLib.namespace("myplugin");
-```
-The id decides scope (i.e. `myplugin:strawberry`). The namespace includes things like item and block registration. Registration is immutable after the plugin is enabled. 
+## Core Concept Additions & Changes
 
 ### Items
-Items are a "configured wrapper" around a base Material/ItemStack.
-```java
-ns.item("strawberry")
-    .displayName("Strawberry")
-    .texture("items/strawberry.png")
-    .baseItem(Material.APPLE);
-```
-#### Required Props
-```java
-.baseItem(Material)
-// or
-.itemStack(ItemStack)
-```
 
-#### Additional Props
+#### Model Prop
+
+The `.model()` prop specifies a JSON model path within the plugin's asset folder.
+
 ```java
-.displayName(String)
-.texture(String)
-.model(String)
-.itemMeta(Consumer<ItemMeta>)
-```
-
-#### Behavior Hooks
-```java
-.onUse(event -> {})
-.onConsume(event -> {})
-.onEquip(event -> {})
-.onUnequip(event -> {})
-.onHitEntity(event -> {})
-```
-
-#### Item Creation
-```java
-ItemStack stack = ns.item("strawberry").create();
-// Helpers
-.create(int amount)
-.give(Player player)
-```
-
-#### Constraints
-- No hardcoded "weapon"/"food" archetypes.
-- Patterns > Features
-- Stats are handled via `itemMeta` and event hooks.
-
-#### Examples
-```java
-// Food
-ns.item("strawberry")
-    .baseItem(Material.APPLE)
-    .onConsume(e -> {
-        // Technical superflous since apple has a hunger amount
-        int hungerAmount = 4;
-        e.player().setFoodLevel(e.player().getFoodLevel() + hungerAmount);
-    });
-
-// Weapon
-ns.item("steel_sword")
+ns.item("cool_sword")
     .baseItem(Material.DIAMOND_SWORD)
-    .itemMeta(meta -> {
-        AttributeModifier modifier = new AttributeModifier(
-            UUID.randomUUID(),
-            "generic.attackDamage",
-            10.0, // Damage amount
-            AttributeModifier.Operation.ADD_NUMBER,
-            EquipmentSlot.HAND
-        );
-
-        meta.addAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE, modifier);
-    });
+    .model("items/cool_sword")
+    .displayName("Cool Sword");
 ```
 
 ### Blocks
-A block is:
-- A placed vanilla `baseBlock`
-- Display entity over the block
+
+A custom block of a physical, placed vanilla `baseBlock` `Material` and an `ItemDisplay` entity spawned at the block location to provide visuals. Identity is stored via a `PersistentDataContainer` tag on the spawned entity.
+
 ```java
 ns.block("marble")
     .baseBlock(Material.STONE)
-    .display(d -> d.allAround("blocks/marble.png"));
+    .displayName("Marble")
+    .rotates(false)
+    .display(d -> d.allAround("blocks/marble"));
 ```
 
 #### Required Props
 ```java
 .baseBlock(Material)
-.type()
 ```
 
 #### Optional Props
@@ -114,26 +48,99 @@ ns.block("marble")
 ```
 
 #### Display Builder
+
+OnyxLib automatically generates a block JSON model behind the scenes during resource pack generation.
+
 ```java
 .display(d -> d
-    .allAround("blocks/marble.png")
+    .allAround("blocks/marble")
 )
 
 // or per-face
 .display(d -> d
-    .north("...")
-    .south("...")
-    .top("...")
+    .north("blocks/marble_front")
+    .south("blocks/marble_back")
+    .top("blocks/marble_top")
 );
 ```
 
-#### Behavior Hooks
+**Note:** If `.display()` is configured but not all sides are accounted for, an error will be thrown.
+
+### Namespace Queries
+
+To cleanly resolve identity validation, the root namespace acts as the definiative lookup manager.
+
 ```java
-.onPlace(event -> {})
-.onBreak(event -> {})
-.onInteract(event -> {})
+// Item lookup
+OnyxItem item = ns.matchItem(ItemStack stack);
+
+// Block lookup (checks if a tagged display entity exists)
+OnyxBlock block = ns.matchBlock(Block block);
 ```
 
-#### Constraints
-- No tile entity system
-- Interaction is purely event driven
+```java
+@EventHandler
+public void onPlayerInteract(PlayerInteractEvent event) {
+    Player player = event.getPlayer();
+
+    // Custom Item
+    ItemStack handItem = player.getInventory().getItemInMainHand();
+    OnyxItem customItem = ns.matchItem(handItem);
+    if (customItem != null && customItem.getId().equals("ray_gun")) {
+        player.sendMessage("Pew pew!");
+        return;
+    }
+
+    // Custom Block
+    if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+        Block clickedBlock = event.getClickedBlock();
+        OnyxBlock customBlock = ns.matchBlock(clickedBlock);
+        
+        if (customBlock != null && customBlock.getId().equals("engine")) {
+            player.sendMessage("Engine Started!");
+        }
+    }
+}
+```
+
+
+### Events & Lifecycle
+
+To avoid re-inventing an event system, two new custom Paper events are exposed. It hooks into Paper events at `EventPriority.MONITOR` to safely handle the `ItemDisplay` entities before passing control to the developer-facing event.
+
+- **`OnyxBlockPlaceEvent`:** Fires after a block is successfully placed and its display entity has been spawned and tagged.
+- **`OnyxBlockBreakEvent`:** Fires when a block is broken, immediately before the display entity is stripped and deleted by OnyxLib.
+
+```java
+@EventHandler
+public void onChairPlace(OnyxBlockPlaceEvent event) {
+    if (!event.getOnyxBlock().getId().equals("oak_chair")) return;
+
+    Location loc = event.getBlock().getLocation().add(0.5, 0.0, 0.5);
+    
+    // Spawn an armor stand to handle sitting
+    ArmorStand chairSeat = loc.getWorld().spawn(loc, ArmorStand.class, armorStand -> {
+        armorStand.setVisible(false);
+        armorStand.setGravity(false);
+        armorStand.setMarker(true);
+        
+        // Tag it
+        armorStand.getPersistentDataContainer().set(
+            new NamespacedKey("my_plugin", "chair_seat"), 
+            PersistentDataType.BOOLEAN, 
+            true
+        );
+    });
+}
+
+@EventHandler
+public void onChairBreak(OnyxBlockBreakEvent event) {
+    if (!event.getOnyxBlock().getId().equals("oak_chair")) return;
+
+    // Clean up armor stand
+    Location loc = event.getBlock().getLocation().add(0.5, 0.0, 0.5);
+    loc.getWorld().getNearbyEntities(loc, 0.5, 0.5, 0.5).stream()
+        .filter(e -> e instanceof ArmorStand && e.getPersistentDataContainer().has(new NamespacedKey("my_plugin", "chair_seat")))
+        .forEach(Entity::remove);
+}
+```
