@@ -20,6 +20,7 @@ public class OnyxItemImpl implements OnyxItem {
     private Material baseMaterial;
     private Component displayName;
     private String texturePath;
+    private String customModelPath;
     private Consumer<ItemMeta> metaConsumer;
 
     public OnyxItemImpl(String id, NamespacedKey elementKey, NamespacedKey onyxKey) {
@@ -30,6 +31,7 @@ public class OnyxItemImpl implements OnyxItem {
 
     public String getId() { return id; }
     public String getTexturePath() { return texturePath; }
+    public String getCustomModelPath() { return customModelPath; }
     public Material getBaseMaterial() { return baseMaterial; }
     public NamespacedKey getKey() { return elementKey; }
 
@@ -63,6 +65,20 @@ public class OnyxItemImpl implements OnyxItem {
         }
 
         this.texturePath = path;
+        return this;
+    }
+
+    @Override
+    public OnyxItem model(String path) {
+        // check for dev adding extension
+        if (path.endsWith(".json")) {
+            throw new IllegalArgumentException(
+                    "Model path for item '" + id + "' must not include the .json extension. " +
+                            "Got: \"" + path + "\", expected: \"" + path.substring(0, path.length() - 5) + "\""
+            );
+        }
+
+        this.customModelPath = path;
         return this;
     }
 

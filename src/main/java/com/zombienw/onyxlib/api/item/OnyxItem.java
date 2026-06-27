@@ -44,6 +44,14 @@ public interface OnyxItem extends OnyxElement {
     OnyxItem texture(String path);
 
     /**
+     * Sets the relative path to the developer made JSON item model.
+     * The path is relative to assets/<namespace>/models/ in your plugin jar.
+     * @param path The path without extension (e.g., "items/cool_sword")
+     * @return This OnyxItem instance.
+     */
+    OnyxItem model(String path);
+
+    /**
      * Provides direct access to the ItemMeta for complex modifications.
      * @param metaConsumer A consumer to manipulate the item's meta.
      * @return This OnyxItem instance.

@@ -28,6 +28,7 @@ public class OnyxBlockImpl implements OnyxBlock {
 
     private Material baseBlock;
     private Component displayName;
+    private String customModelPath;
     private OnyxBlockDisplay blockDisplay;
     private boolean rotates = false;
 
@@ -39,6 +40,7 @@ public class OnyxBlockImpl implements OnyxBlock {
 
     public String getId() { return id; }
     public OnyxBlockDisplay getBlockDisplay() { return blockDisplay; }
+    public String getCustomModelPath() { return customModelPath; }
     public Material getBaseBlock() { return baseBlock; }
     public NamespacedKey getKey() { return elementKey; }
 
@@ -66,15 +68,28 @@ public class OnyxBlockImpl implements OnyxBlock {
     }
 
     @Override
+    public OnyxBlock model(String path) {
+        // check for dev adding extension
+        if (path.endsWith(".json")) {
+            throw new IllegalArgumentException(
+                    "Model path for item '" + id + "' must not include the .json extension. " +
+                            "Got: \"" + path + "\", expected: \"" + path.substring(0, path.length() - 5) + "\""
+            );
+        }
+
+        this.customModelPath = path;
+        return this;
+    }
+
+    @Override
     public OnyxBlock blockDisplay(Consumer<OnyxBlockDisplay> builder) {
         if (builder == null) return this;
-
         if (this.blockDisplay == null) this.blockDisplay = new OnyxBlockDisplayImpl();
 
         builder.accept(this.blockDisplay);
 
         // validate faces
-        if (this.blockDisplay instanceof OnyxBlockDisplayImpl impl) {
+        if (this.customModelPath == null && this.blockDisplay instanceof OnyxBlockDisplayImpl impl) {
             Map<String, String> textures = impl.buildTextureMap();
             int expectedFaces = 6;
 

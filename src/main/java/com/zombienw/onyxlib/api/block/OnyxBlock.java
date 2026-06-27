@@ -1,6 +1,7 @@
 package com.zombienw.onyxlib.api.block;
 
 import com.zombienw.onyxlib.api.OnyxElement;
+import com.zombienw.onyxlib.api.item.OnyxItem;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -41,6 +42,14 @@ public interface OnyxBlock extends OnyxElement {
      * @return This OnyxBlock instance.
      */
     OnyxBlock blockDisplay(Consumer<OnyxBlockDisplay> builder);
+
+    /**
+     * Sets the relative path to the developer made JSON item model.
+     * The path is relative to assets/<namespace>/models/ in your plugin jar.
+     * @param path The path without extension (e.g., "blocks/chair")
+     * @return This OnyxBlock instance.
+     */
+    OnyxBlock model(String path);
 
     /**
      * Determines if the custom block should rotate to face the player upon placement.
