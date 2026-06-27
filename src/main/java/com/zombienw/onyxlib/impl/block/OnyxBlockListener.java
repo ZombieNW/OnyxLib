@@ -100,7 +100,7 @@ public class OnyxBlockListener implements Listener {
         if (!(NamespaceRegistry.getElement(registryKey) instanceof OnyxBlock onyxBlock)) return;
 
         // dispatch event
-        plugin.getServer().getPluginManager().callEvent(new OnyxBlockBreakEvent(block, event.getPlayer(), onyxBlock, display));
+        plugin.getServer().getPluginManager().callEvent(new OnyxBlockBreakEvent(block, event.getPlayer(), onyxBlock));
 
         display.remove(); // remove entity
 

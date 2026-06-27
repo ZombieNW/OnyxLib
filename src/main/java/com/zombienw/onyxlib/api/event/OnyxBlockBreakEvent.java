@@ -20,8 +20,7 @@ public class OnyxBlockBreakEvent extends BlockEvent {
     public OnyxBlockBreakEvent(
             @NonNull Block theBlock,
             @NonNull Player player,
-            @NonNull OnyxBlock onyxBlock,
-            @NonNull ItemDisplay displayEntity
+            @NonNull OnyxBlock onyxBlock
     ) {
         super(theBlock);
         this.player = player;
