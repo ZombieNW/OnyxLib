@@ -12,6 +12,7 @@ public class OnyxBlockDisplayImpl implements OnyxBlockDisplay {
 
     @Override
     public OnyxBlockDisplay all(String texturePath) {
+        checkExtension(texturePath);
         for (Face face : Face.values()) {
             this.textures.put(face, texturePath);
         }
@@ -20,6 +21,7 @@ public class OnyxBlockDisplayImpl implements OnyxBlockDisplay {
 
     @Override
     public OnyxBlockDisplay sides(String texturePath) {
+        checkExtension(texturePath);
         this.textures.put(Face.NORTH, texturePath);
         this.textures.put(Face.SOUTH, texturePath);
         this.textures.put(Face.EAST, texturePath);
@@ -29,6 +31,7 @@ public class OnyxBlockDisplayImpl implements OnyxBlockDisplay {
 
     @Override
     public OnyxBlockDisplay vertical(String texturePath) {
+        checkExtension(texturePath);
         this.textures.put(Face.TOP, texturePath);
         this.textures.put(Face.BOTTOM, texturePath);
         return this;
@@ -38,36 +41,42 @@ public class OnyxBlockDisplayImpl implements OnyxBlockDisplay {
 
     @Override
     public OnyxBlockDisplay top(String texturePath) {
+        checkExtension(texturePath);
         this.textures.put(Face.TOP, texturePath);
         return this;
     }
 
     @Override
     public OnyxBlockDisplay bottom(String texturePath) {
+        checkExtension(texturePath);
         this.textures.put(Face.BOTTOM, texturePath);
         return this;
     }
 
     @Override
     public OnyxBlockDisplay north(String texturePath) {
+        checkExtension(texturePath);
         this.textures.put(Face.NORTH, texturePath);
         return this;
     }
 
     @Override
     public OnyxBlockDisplay south(String texturePath) {
+        checkExtension(texturePath);
         this.textures.put(Face.SOUTH, texturePath);
         return this;
     }
 
     @Override
     public OnyxBlockDisplay east(String texturePath) {
+        checkExtension(texturePath);
         this.textures.put(Face.EAST, texturePath);
         return this;
     }
 
     @Override
     public OnyxBlockDisplay west(String texturePath) {
+        checkExtension(texturePath);
         this.textures.put(Face.WEST, texturePath);
         return this;
     }
@@ -75,6 +84,14 @@ public class OnyxBlockDisplayImpl implements OnyxBlockDisplay {
     @Override
     public String getTexture(OnyxBlockDisplay.Face face) {
         return this.textures.get(face);
+    }
+
+    private void checkExtension(String path) {
+        if (path.endsWith(".png")) {
+            throw new IllegalArgumentException(
+                    "Texture path for block must not include the .png extension. "
+            );
+        }
     }
 
     // build read only map of textures
