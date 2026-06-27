@@ -142,7 +142,8 @@ public class OnyxBlockImpl implements OnyxBlock {
 
         if (this.rotates) {
             float yaw = location.getYaw();
-            float snappedYaw = Math.round(yaw / 90.0f) * 90.0f;
+            float snappedYaw = Math.round((yaw + 180.0f) / 90.0f) * 90.0f; // add 180 to flip it
+            snappedYaw = (snappedYaw % 360.0f + 360.0f) % 360.0f; // normalize
             entityLoc.setYaw(snappedYaw);
             entityLoc.setPitch(0.0f);
         }
