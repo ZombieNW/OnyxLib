@@ -135,7 +135,7 @@ public class OnyxNamespaceImpl implements OnyxNamespace {
         this.isLocked = true;
 
         // Textures are now validated by the pack generator
-        // Base materials are now validated at itemstack creation
+        // Base materials are now validated at ItemStack creation
     }
 
     public Collection<OnyxItemImpl> getItems() { return this.registeredItems.values(); }
