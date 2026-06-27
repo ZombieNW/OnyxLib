@@ -1,5 +1,6 @@
 package com.zombienw.onyxlib.api.item;
 
+import com.zombienw.onyxlib.api.OnyxElement;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -7,7 +8,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.function.Consumer;
 
-public interface OnyxItem {
+public interface OnyxItem extends OnyxElement {
 
     /**
      * Sets the underlying vanilla material for this item.
@@ -48,21 +49,4 @@ public interface OnyxItem {
      * @return This OnyxItem instance.
      */
     OnyxItem itemMeta(Consumer<ItemMeta> metaConsumer);
-
-    /**
-     * Generates a single ItemStack representing this custom item.
-     * Automatically applies CustomModelData and PDC tags.
-     * @return A new ItemStack.
-     * @throws IllegalStateException If baseItem is not defined.
-     */
-    ItemStack create();
-
-    /**
-     * Generates a stack of this custom item.
-     * Automatically applies CustomModelData and PDC tags.
-     * @param amount The size of the stack.
-     * @return A new ItemStack.
-     * @throws IllegalStateException If baseItem is not defined.
-     */
-    ItemStack create(int amount);
 }

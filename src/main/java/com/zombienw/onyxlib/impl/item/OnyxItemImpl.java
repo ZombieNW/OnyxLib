@@ -14,24 +14,24 @@ import java.util.function.Consumer;
 public class OnyxItemImpl implements OnyxItem {
 
     private final String id;
-    private final NamespacedKey pdcKey;
-    private final NamespacedKey itemKey;
+    private final NamespacedKey elementKey; // element specific key
+    private final NamespacedKey onyxKey; // unified pdc key
 
     private Material baseMaterial;
     private Component displayName;
     private String texturePath;
     private Consumer<ItemMeta> metaConsumer;
 
-    public OnyxItemImpl(String id, NamespacedKey itemKey, NamespacedKey pdcKey) {
+    public OnyxItemImpl(String id, NamespacedKey elementKey, NamespacedKey onyxKey) {
         this.id = id;
-        this.itemKey = itemKey;
-        this.pdcKey = pdcKey;
+        this.elementKey = elementKey;
+        this.onyxKey = onyxKey;
     }
 
     public String getId() { return id; }
     public String getTexturePath() { return texturePath; }
     public Material getBaseMaterial() { return baseMaterial; }
-    public NamespacedKey getKey() { return itemKey; }
+    public NamespacedKey getKey() { return elementKey; }
 
     @Override
     public OnyxItem baseItem(Material material) {
@@ -92,8 +92,8 @@ public class OnyxItemImpl implements OnyxItem {
                 meta.displayName(this.displayName);
             }
 
-            meta.setItemModel(this.itemKey);
-            meta.getPersistentDataContainer().set(this.pdcKey, PersistentDataType.STRING, this.id);
+            meta.setItemModel(this.elementKey);
+            meta.getPersistentDataContainer().set(this.onyxKey, PersistentDataType.STRING, this.id);
 
             if (this.metaConsumer != null) {
                 this.metaConsumer.accept(meta);

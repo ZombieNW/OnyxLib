@@ -1,6 +1,7 @@
 package com.zombienw.onyxlib.impl.registry;
 
 
+import com.zombienw.onyxlib.api.OnyxElement;
 import com.zombienw.onyxlib.api.OnyxNamespace;
 import com.zombienw.onyxlib.impl.item.OnyxItemImpl;
 import org.bukkit.NamespacedKey;
@@ -45,12 +46,12 @@ public final class NamespaceRegistry {
     }
 
     /**
-     * Retrieves an item across all namespaces using its full key.
+     * Retrieves an item or block across all namespaces using its full key.
      */
-    public static OnyxItemImpl getItem(NamespacedKey key) {
+    public static OnyxElement getElement(NamespacedKey key) {
         OnyxNamespaceImpl ns = namespaces.get(key.getNamespace());
         if (ns != null) {
-            return ns.getItem(key.getKey());
+            return ns.getElement(key.getKey());
         }
         return null;
     }

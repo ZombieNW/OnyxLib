@@ -1,5 +1,6 @@
 package com.zombienw.onyxlib;
 
+import com.zombienw.onyxlib.api.OnyxElement;
 import com.zombienw.onyxlib.impl.item.OnyxItemImpl;
 import com.zombienw.onyxlib.impl.pack.PackGenerator;
 import com.zombienw.onyxlib.impl.registry.NamespaceRegistry;
@@ -79,9 +80,9 @@ public class OnyxCommand implements CommandExecutor, TabCompleter {
                 return true;
             }
 
-            OnyxItemImpl item = NamespaceRegistry.getItem(key);
-            if (item == null) {
-                sender.sendMessage(Component.text("Unknown OnyxLib item: " + key, NamedTextColor.RED));
+            OnyxElement element = NamespaceRegistry.getElement(key);
+            if (element == null) {
+                sender.sendMessage(Component.text("Unknown OnyxLib element: " + key, NamedTextColor.RED));
                 return true;
             }
 
@@ -92,7 +93,7 @@ public class OnyxCommand implements CommandExecutor, TabCompleter {
                 } catch (NumberFormatException ignored) {}
             }
 
-            ItemStack stack = item.create(amount);
+            ItemStack stack = element.create(amount);
             player.getInventory().addItem(stack);
             sender.sendMessage(Component.text("Given " + amount + " " + key, NamedTextColor.GREEN));
             return true;
@@ -110,8 +111,8 @@ public class OnyxCommand implements CommandExecutor, TabCompleter {
             completions.add("generatePack");
         } else if (args.length == 2 && args[0].equalsIgnoreCase("give")) {
             for (OnyxNamespaceImpl ns : NamespaceRegistry.getAllNamespaces()) {
-                for (OnyxItemImpl item : ns.getItems()) {
-                    completions.add(item.getKey().toString());
+                for (OnyxElement element : ns.getElements()) {
+                    completions.add(element.getKey().toString());
                 }
             }
         }
