@@ -1,6 +1,8 @@
 package com.zombienw.onyxlib.impl.pack;
 
 import com.zombienw.onyxlib.OnyxPlugin;
+import com.zombienw.onyxlib.impl.block.OnyxBlockDisplayImpl;
+import com.zombienw.onyxlib.impl.block.OnyxBlockImpl;
 import com.zombienw.onyxlib.impl.item.OnyxItemImpl;
 import com.zombienw.onyxlib.impl.registry.NamespaceRegistry;
 import com.zombienw.onyxlib.impl.registry.OnyxNamespaceImpl;
@@ -10,9 +12,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -30,11 +30,20 @@ public class PackGenerator {
 
     public String generate() throws IOException {
         List<OnyxItemImpl> assetItems = new ArrayList<>();
+        List<OnyxBlockImpl> assetBlocks = new ArrayList<>();
 
         for (OnyxNamespaceImpl ns : NamespaceRegistry.getAllNamespaces()) {
+            // Collect Items
             for (OnyxItemImpl item : ns.getItems()) {
                 if (item.getTexturePath() != null) {
                     assetItems.add(item);
+                }
+            }
+
+            // Collect Blocks
+            for (OnyxBlockImpl block : ns.getBlocks()) {
+                if (block.getBlockDisplay() != null) {
+                    assetBlocks.add(block);
                 }
             }
         }
@@ -46,17 +55,27 @@ public class PackGenerator {
         Path tempDir = Files.createTempDirectory("onyxlib-pack-temp-");
 
         try {
+            // Resource Pack Boilerplate
             writeMcMeta(tempDir);
             writeIconImage(tempDir);
-            writeTextures(tempDir, assetItems);
-            writeModelFiles(tempDir, assetItems);
+
+            // Process Items
+            writeItemTextures(tempDir, assetItems);
+            writeItemModelFiles(tempDir, assetItems);
             writeItemDefinitions(tempDir, assetItems);
+
+            // Process Blocks
+            writeBlockTextures(tempDir, assetBlocks);
+            writeBlockModelFiles(tempDir, assetBlocks);
+            writeBlockItemDefinitions(tempDir, assetBlocks);
+
             zipDirectory(tempDir, outputFile.toPath());
         } finally {
             deleteDirectory(tempDir);
         }
 
-        return "Resource pack generated: " + outputFile.getName() + " (" + assetItems.size() + " items)";
+        int totalAssets = assetItems.size() + assetBlocks.size();
+        return "Resource pack generated: " + outputFile.getName() + " (" + totalAssets + " assets)";
     }
 
     private void writeMcMeta(Path root) throws IOException {
@@ -68,7 +87,6 @@ public class PackGenerator {
               }
             }
             """.formatted(PACK_FORMAT, PACK_DESCRIPTION);
-
         Files.writeString(root.resolve("pack.mcmeta"), mcmeta);
     }
 
@@ -83,43 +101,31 @@ public class PackGenerator {
         Files.copy(stream, dest, StandardCopyOption.REPLACE_EXISTING);
     }
 
-    private void writeTextures(Path root, List<OnyxItemImpl> items) throws IOException {
+    // Item Generation
+
+    private void writeItemTextures(Path root, List<OnyxItemImpl> items) throws IOException {
         for (OnyxItemImpl item : items) {
             String namespace = item.getKey().getNamespace();
-            Plugin owningPlugin = NamespaceRegistry.getNamespace(namespace).getPlugin();
-
-            String resourcePath = "assets/" + namespace + "/textures/" + item.getTexturePath() + ".png";
-            InputStream stream = owningPlugin.getResource(resourcePath);
-
-            if (stream == null) {
-                throw new IOException("Missing texture in " + owningPlugin.getName() + " jar: " + resourcePath);
-            }
-
-            Path dest = root.resolve(resourcePath);
-            Files.createDirectories(dest.getParent());
-            try (stream) {
-                Files.copy(stream, dest, StandardCopyOption.REPLACE_EXISTING);
-            }
+            String texturePath = item.getTexturePath();
+            copyTexture(root, namespace, texturePath);
         }
     }
 
-    private void writeModelFiles(Path root, List<OnyxItemImpl> items) throws IOException {
+    private void writeItemModelFiles(Path root, List<OnyxItemImpl> items) throws IOException {
         for (OnyxItemImpl item : items) {
             String namespace = item.getKey().getNamespace();
             String itemId = item.getId();
-
             Path modelDest = root.resolve("assets/" + namespace + "/models/item/" + itemId + ".json");
             Files.createDirectories(modelDest.getParent());
 
-            String textureRef = namespace + ":" + item.getTexturePath();
             String modelJson = """
                 {
                   "parent": "minecraft:item/generated",
                   "textures": {
-                    "layer0": "%s"
+                    "layer0": "%s:%s"
                   }
                 }
-                """.formatted(textureRef);
+                """.formatted(namespace, item.getTexturePath());
 
             Files.writeString(modelDest, modelJson);
         }
@@ -127,27 +133,159 @@ public class PackGenerator {
 
     private void writeItemDefinitions(Path root, List<OnyxItemImpl> items) throws IOException {
         for (OnyxItemImpl item : items) {
-            String namespace = item.getKey().getNamespace();
-            String itemId = item.getId();
-
-            // create a assets/<namespace>/items/<id>.json
-            Path defPath = root.resolve("assets/" + namespace + "/items/" + itemId + ".json");
-            Files.createDirectories(defPath.getParent());
-
-            // point to the model created in writeModelFiles()
-            String modelRef = namespace + ":item/" + itemId;
-
-            String itemJson = """
-                {
-                  "model": {
-                    "type": "minecraft:model",
-                    "model": "%s"
-                  }
-                }
-                """.formatted(modelRef);
-
-            Files.writeString(defPath, itemJson);
+            createItemDefinitionJson(root, item.getKey().getNamespace(), item.getId());
         }
+    }
+
+    // Block Generation
+
+    private void writeBlockTextures(Path root, List<OnyxBlockImpl> blocks) throws IOException {
+        for (OnyxBlockImpl block : blocks) {
+            String namespace = block.getKey().getNamespace();
+
+            // get each texture
+            Collection<String> texturePaths = new HashSet<>(((OnyxBlockDisplayImpl) block.getBlockDisplay()).buildTextureMap().values());
+            for (String texturePath : texturePaths) {
+                copyTexture(root, namespace, texturePath);
+            }
+        }
+    }
+
+    private void writeBlockModelFiles(Path root, List<OnyxBlockImpl> blocks) throws IOException {
+        for (OnyxBlockImpl block : blocks) {
+            String namespace = block.getKey().getNamespace();
+            String blockId = block.getId();
+            Path modelDest = root.resolve("assets/" + namespace + "/models/item/" + blockId + ".json");
+            Files.createDirectories(modelDest.getParent());
+
+            Map<String, String> rawTextures = ((OnyxBlockDisplayImpl) block.getBlockDisplay()).buildTextureMap();
+            List<String> textureLines = new ArrayList<>();
+            List<String> faceLines = new ArrayList<>();
+
+            // Assign the first mapped texture as the block's particle texture
+            String firstTexture = rawTextures.values().iterator().next();
+            textureLines.add(String.format("        \"particle\": \"%s:%s\"", namespace, firstTexture));
+
+            for (Map.Entry<String, String> entry : rawTextures.entrySet()) {
+                String mcFace = mapToMinecraftFace(entry.getKey());
+                String textureRef = namespace + ":" + entry.getValue();
+
+                textureLines.add(String.format("        \"%s\": \"%s\"", mcFace, textureRef));
+                faceLines.add(String.format("                \"%s\": { \"uv\": [0, 0, 16, 16], \"texture\": \"#%s\" }", mcFace, mcFace));
+            }
+
+            String texturesJson = String.join(",\n", textureLines);
+            String facesJson = String.join(",\n", faceLines);
+
+            String modelJson = getBlockModelTemplate(texturesJson, facesJson);
+            Files.writeString(modelDest, modelJson);
+        }
+    }
+
+    private void writeBlockItemDefinitions(Path root, List<OnyxBlockImpl> blocks) throws IOException {
+        for (OnyxBlockImpl block : blocks) {
+            createItemDefinitionJson(root, block.getKey().getNamespace(), block.getId());
+        }
+    }
+
+    // Helpers
+
+    private void copyTexture(Path root, String namespace, String texturePath) throws IOException {
+        Plugin owningPlugin = NamespaceRegistry.getNamespace(namespace).getPlugin();
+        String resourcePath = "assets/" + namespace + "/textures/" + texturePath + ".png";
+
+        Path dest = root.resolve(resourcePath);
+        if (Files.exists(dest)) return; // Skip if multiple blocks/items share the same texture
+
+        InputStream stream = owningPlugin.getResource(resourcePath);
+        if (stream == null) {
+            throw new IOException("Missing texture in " + owningPlugin.getName() + " jar: " + resourcePath);
+        }
+
+        Files.createDirectories(dest.getParent());
+        try (stream) {
+            Files.copy(stream, dest, StandardCopyOption.REPLACE_EXISTING);
+        }
+    }
+
+    private void createItemDefinitionJson(Path root, String namespace, String id) throws IOException {
+        Path defPath = root.resolve("assets/" + namespace + "/items/" + id + ".json");
+        Files.createDirectories(defPath.getParent());
+
+        String itemJson = """
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "%s:item/%s"
+              }
+            }
+            """.formatted(namespace, id);
+
+        Files.writeString(defPath, itemJson);
+    }
+
+    private String mapToMinecraftFace(String internalFace) {
+        return switch (internalFace.toLowerCase()) {
+            case "top" -> "up";
+            case "bottom" -> "down";
+            default -> internalFace.toLowerCase();
+        };
+    }
+
+    private String getBlockModelTemplate(String texturesJson, String facesJson) {
+        return """
+            {
+                "credit": "Generated by OnyxLib",
+                "textures": {
+            %s
+                },
+                "elements": [
+                    {
+                        "from": [0, 0, 0],
+                        "to": [16, 16, 16],
+                        "faces": {
+            %s
+                        }
+                    }
+                ],
+                "display": {
+                    "thirdperson_righthand": {
+                        "rotation": [75, 45, 0],
+                        "translation": [0, 2.5, 0],
+                        "scale": [0.375, 0.375, 0.375]
+                    },
+                    "thirdperson_lefthand": {
+                        "rotation": [75, 45, 0],
+                        "translation": [0, 2.5, 0],
+                        "scale": [0.375, 0.375, 0.375]
+                    },
+                    "firstperson_righthand": {
+                        "rotation": [0, 45, 0],
+                        "scale": [0.4, 0.4, 0.4]
+                    },
+                    "firstperson_lefthand": {
+                        "rotation": [0, 225, 0],
+                        "scale": [0.4, 0.4, 0.4]
+                    },
+                    "ground": {
+                        "translation": [0, 3, 0],
+                        "scale": [0.25, 0.25, 0.25]
+                    },
+                    "gui": {
+                        "rotation": [30, 225, 0],
+                        "scale": [0.625, 0.625, 0.625]
+                    },
+                    "head": {
+                        "translation": [0, 0, 0],
+                        "scale": [1, 1, 1]
+                    },
+                    "fixed": {
+                        "translation": [0, 0, 0],
+                        "scale": [1.0005, 1.0005, 1.0005]
+                    }
+                }
+            }
+            """.formatted(texturesJson, facesJson);
     }
 
     // zip temp directory into output file
