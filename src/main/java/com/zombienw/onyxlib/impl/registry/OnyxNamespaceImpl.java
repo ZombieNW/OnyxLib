@@ -15,10 +15,9 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.Plugin;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -29,19 +28,19 @@ public class OnyxNamespaceImpl implements OnyxNamespace {
     private final Plugin plugin;
     private final NamespacedKey namespaceKey;
     private final NamespacedKey onyxKey; // unified key for all elements
-    private boolean isLocked = false;
+    private volatile boolean isLocked = false;
 
     private final Map<String, OnyxElement> allElements = new ConcurrentHashMap<>();
     private final Map<String, OnyxItemImpl> registeredItems = new ConcurrentHashMap<>();
     private final Map<String, OnyxBlockImpl> registeredBlocks = new ConcurrentHashMap<>();
-
-    public Plugin getPlugin() { return this.plugin; }
 
     public OnyxNamespaceImpl(Plugin plugin, String namespaceId) {
         this.plugin = plugin;
         this.namespaceKey = new NamespacedKey(plugin, namespaceId);
         this.onyxKey = new NamespacedKey(plugin, "onyx_id");
     }
+
+    public Plugin getPlugin() { return this.plugin; }
 
     @Override
     public NamespacedKey getKey() {
@@ -57,13 +56,16 @@ public class OnyxNamespaceImpl implements OnyxNamespace {
                     "' because this ID already exists in namespace '" + plugin.getName() + "'.");
         }
 
-        return this.registeredItems.computeIfAbsent(id, k -> {
-            NamespacedKey itemKey = new NamespacedKey(this.plugin, id);
-            OnyxItemImpl item = new OnyxItemImpl(id, itemKey, this.onyxKey);
+        NamespacedKey itemKey = new NamespacedKey(this.plugin, id);
+        OnyxItemImpl item = new OnyxItemImpl(id, itemKey, this.onyxKey);
 
-            this.allElements.put(id, item);
-            return item;
-        });
+        OnyxItemImpl existing = registeredItems.putIfAbsent(id, item);
+        if (existing != null) {
+            return existing;
+        }
+
+        allElements.put(id, item);
+        return item;
     }
 
     @Override
@@ -71,17 +73,20 @@ public class OnyxNamespaceImpl implements OnyxNamespace {
         if (this.isLocked) throwLockedException(id);
 
         if (this.allElements.containsKey(id)) {
-            throw new IllegalArgumentException("Conflict: Cannot register item '" + id +
+            throw new IllegalArgumentException("Conflict: Cannot register block '" + id +
                     "' because this ID already exists in namespace '" + plugin.getName() + "'.");
         }
 
-        return this.registeredBlocks.computeIfAbsent(id, k -> {
-            NamespacedKey blockKey = new NamespacedKey(this.plugin, id);
-            OnyxBlockImpl block = new OnyxBlockImpl(id, blockKey, this.onyxKey);
+        NamespacedKey blockKey = new NamespacedKey(this.plugin, id);
+        OnyxBlockImpl block = new OnyxBlockImpl(id, blockKey, this.onyxKey);
 
-            this.allElements.put(id, block);
-            return block;
-        });
+        OnyxBlockImpl existing = registeredBlocks.putIfAbsent(id, block);
+        if (existing != null) {
+            return existing;
+        }
+
+        allElements.put(id, block);
+        return block;
     }
 
     @Override
@@ -92,9 +97,7 @@ public class OnyxNamespaceImpl implements OnyxNamespace {
         if (meta == null) return null;
 
         String onyxId = meta.getPersistentDataContainer().get(onyxKey, PersistentDataType.STRING);
-        if (onyxId == null) return null;
-
-        return registeredItems.get(onyxId);
+        return onyxId != null ? registeredItems.get(onyxId) : null;
     }
 
     @Override
@@ -104,15 +107,15 @@ public class OnyxNamespaceImpl implements OnyxNamespace {
         Location loc = block.getLocation().add(0.5, 0.5, 0.5);
         if (loc.getWorld() == null) return null;
 
-        return (OnyxBlock) loc.getWorld().getNearbyEntities(loc, 0.1, 0.1, 0.1).stream()
+        return loc.getWorld().getNearbyEntities(loc, 0.25, 0.25, 0.25).stream()
                 .filter(entity -> entity instanceof ItemDisplay)
                 .map(entity -> (ItemDisplay) entity)
                 .filter(display -> display.getPersistentDataContainer().has(onyxKey, PersistentDataType.STRING))
                 .map(display -> {
                     String onyxId = display.getPersistentDataContainer().get(onyxKey, PersistentDataType.STRING);
-                    return registeredBlocks.get(onyxId);
+                    return onyxId != null ? registeredBlocks.get(onyxId) : null;
                 })
-                .filter(java.util.Objects::nonNull)
+                .filter(Objects::nonNull)
                 .findFirst()
                 .orElse(null);
     }
@@ -131,25 +134,8 @@ public class OnyxNamespaceImpl implements OnyxNamespace {
         if (this.isLocked) return;
         this.isLocked = true;
 
-        // validate items
-        for (OnyxItemImpl item : registeredItems.values()) {
-            // check base material
-            if (item.getBaseMaterial() == null) {
-                plugin.getLogger().warning("Item '" + item.getId() + "' was registered but never assigned a base material. It will be unusable.");
-            }
-
-            // check that textures exist
-            if (item.getTexturePath() != null) {
-                String resourcePath = "assets/" + item.getKey().getNamespace() +
-                        "/textures/" + item.getTexturePath() + ".png";
-                if (plugin.getResource(resourcePath) == null) {
-                    plugin.getLogger().warning(
-                            "Item '" + item.getId() + "' declares texture '" + item.getTexturePath() +
-                                    "' but no file was found at: " + resourcePath
-                    );
-                }
-            }
-        }
+        // Textures are now validated by the pack generator
+        // Base materials are now validated at itemstack creation
     }
 
     public Collection<OnyxItemImpl> getItems() { return this.registeredItems.values(); }
