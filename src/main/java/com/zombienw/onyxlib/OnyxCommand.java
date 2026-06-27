@@ -1,10 +1,8 @@
 package com.zombienw.onyxlib;
 
 import com.zombienw.onyxlib.api.OnyxElement;
-import com.zombienw.onyxlib.impl.item.OnyxItemImpl;
 import com.zombienw.onyxlib.impl.pack.PackGenerator;
 import com.zombienw.onyxlib.impl.registry.NamespaceRegistry;
-import com.zombienw.onyxlib.impl.registry.OnyxNamespaceImpl;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.NamespacedKey;
@@ -16,8 +14,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jspecify.annotations.NonNull;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.stream.Stream;
 
 /**
  * Executes/completes the give and generatePack command.
@@ -39,93 +39,99 @@ public class OnyxCommand implements CommandExecutor, TabCompleter {
 
         String subCommand = args[0].toLowerCase();
 
-        if (subCommand.equals("generatepack")) {
-            if (!sender.hasPermission("onyxlib.admin")) {
-                sender.sendMessage(Component.text("No permission.", NamedTextColor.RED));
-                return true;
-            }
+        return switch (subCommand) {
+            case "generatepack" -> handleGeneratePack(sender);
+            case "give" -> handleGive(sender, args);
+            default -> false;
+        };
+    }
 
-            sender.sendMessage(Component.text("Starting pack generation...", NamedTextColor.YELLOW));
-
-            // Run async
-            plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
-                try {
-                    PackGenerator generator = new PackGenerator(plugin);
-                    String result = generator.generate();
-                    sender.sendMessage(Component.text(result, NamedTextColor.GREEN));
-                } catch (Exception e) {
-                    sender.sendMessage(Component.text("Pack generation failed! Check console.", NamedTextColor.RED));
-                    e.printStackTrace();
-                }
-            });
+    private boolean handleGeneratePack(CommandSender sender) {
+        if (!sender.hasPermission("onyxlib.admin")) {
+            sender.sendMessage(Component.text("No permission.", NamedTextColor.RED));
             return true;
         }
 
-        if (subCommand.equals("give")) {
-            if (!sender.hasPermission("onyxlib.admin")) {
-                sender.sendMessage(Component.text("No permission.", NamedTextColor.RED));
-                return true;
-            }
+        sender.sendMessage(Component.text("Starting pack generation...", NamedTextColor.YELLOW));
 
-            if (!(sender instanceof Player player)) {
-                sender.sendMessage(Component.text("Only players can receive items.", NamedTextColor.RED));
-                return true;
+        plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
+            try {
+                PackGenerator generator = new PackGenerator(plugin);
+                String result = generator.generate();
+                sender.sendMessage(Component.text(result, NamedTextColor.GREEN));
+            } catch (Exception e) {
+                sender.sendMessage(Component.text("Pack generation failed! Check console.", NamedTextColor.RED));
+                plugin.getLogger().log(Level.SEVERE, "Failed to generate pack", e);
             }
+        });
+        return true;
+    }
 
-            if (args.length < 2) {
-                sender.sendMessage(Component.text("Usage: /onyx give <namespace:item_id> [amount]", NamedTextColor.RED));
-                return true;
-            }
-
-            NamespacedKey key = NamespacedKey.fromString(args[1]);
-            if (key == null) {
-                sender.sendMessage(Component.text("Invalid item key format.", NamedTextColor.RED));
-                return true;
-            }
-
-            OnyxElement element = NamespaceRegistry.getElement(key);
-            if (element == null) {
-                sender.sendMessage(Component.text("Unknown OnyxLib element: " + key, NamedTextColor.RED));
-                return true;
-            }
-
-            int amount = 1;
-            if (args.length >= 3) {
-                try {
-                    amount = Integer.parseInt(args[2]);
-                } catch (NumberFormatException ignored) {}
-            }
-
-            ItemStack stack = element.create(amount);
-            player.getInventory().addItem(stack);
-            sender.sendMessage(Component.text("Given " + amount + " " + key, NamedTextColor.GREEN));
+    private boolean handleGive(CommandSender sender, String[] args) {
+        if (!sender.hasPermission("onyxlib.admin")) {
+            sender.sendMessage(Component.text("No permission.", NamedTextColor.RED));
             return true;
         }
 
-        return false;
+        if (!(sender instanceof Player player)) {
+            sender.sendMessage(Component.text("Only players can receive items.", NamedTextColor.RED));
+            return true;
+        }
+
+        if (args.length < 2) {
+            sender.sendMessage(Component.text("Usage: /onyx give <namespace:item_id> [amount]", NamedTextColor.RED));
+            return true;
+        }
+
+        NamespacedKey key = NamespacedKey.fromString(args[1]);
+        if (key == null) {
+            sender.sendMessage(Component.text("Invalid item key format.", NamedTextColor.RED));
+            return true;
+        }
+
+        OnyxElement element = NamespaceRegistry.getElement(key);
+        if (element == null) {
+            sender.sendMessage(Component.text("Unknown OnyxLib element: " + key, NamedTextColor.RED));
+            return true;
+        }
+
+        int amount = 1;
+        if (args.length >= 3) {
+            try {
+                amount = Integer.parseInt(args[2]);
+                if (amount < 1) amount = 1;
+            } catch (NumberFormatException ignored) {}
+        }
+
+        ItemStack stack = element.create(amount);
+        player.getInventory().addItem(stack);
+        sender.sendMessage(Component.text("Given " + amount + " " + key, NamedTextColor.GREEN));
+        return true;
     }
 
     @Override
-    public List<String> onTabComplete(@NonNull CommandSender sender, @NonNull Command command, @NonNull String alias, String[] args) {
-        List<String> completions = new ArrayList<>();
-
-        if (args.length == 1) {
-            completions.add("give");
-            completions.add("generatePack");
-        } else if (args.length == 2 && args[0].equalsIgnoreCase("give")) {
-            for (OnyxNamespaceImpl ns : NamespaceRegistry.getAllNamespaces()) {
-                for (OnyxElement element : ns.getElements()) {
-                    completions.add(element.getKey().toString());
-                }
-            }
+    public List<String> onTabComplete(@NonNull CommandSender sender, @NonNull Command command, @NonNull String alias, String @NonNull [] args) {
+        if (!sender.hasPermission("onyxlib.admin")) {
+            return Collections.emptyList();
         }
 
         String currentArg = args[args.length - 1].toLowerCase();
-        return completions.stream()
-                .filter(c -> {
-                    String lowerC = c.toLowerCase();
-                    return lowerC.startsWith(currentArg) || lowerC.contains(":" + currentArg);
-                })
-                .toList();
+
+        if (args.length == 1) {
+            return Stream.of("give", "generatePack")
+                    .filter(sub -> sub.toLowerCase().startsWith(currentArg))
+                    .toList();
+        }
+
+        if (args.length == 2 && args[0].equalsIgnoreCase("give")) {
+            return NamespaceRegistry.getAllNamespaces().stream()
+                    .flatMap(ns -> ns.getElements().stream())
+                    .map(element -> element.getKey().toString())
+                    .filter(keyStr -> keyStr.toLowerCase().startsWith(currentArg) ||
+                            keyStr.toLowerCase().contains(":" + currentArg))
+                    .toList();
+        }
+
+        return Collections.emptyList();
     }
 }
