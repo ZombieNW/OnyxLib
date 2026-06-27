@@ -10,8 +10,8 @@ import org.bukkit.event.server.ServerLoadEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
- * The core JavaPlugin instance for OnyxLib.
- * Manages the lifecycle of the framework and triggers global state changes.
+ * The actual JavaPlugin for OnyxLib.
+ * Manages lifecycle and triggers event listeners.
  */
 public class OnyxPlugin extends JavaPlugin implements Listener {
 

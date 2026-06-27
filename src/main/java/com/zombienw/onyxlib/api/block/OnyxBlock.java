@@ -10,6 +10,10 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.function.Consumer;
 
+/**
+ * Represents a custom block.
+ * Acts as the builder for itself.
+ */
 public interface OnyxBlock extends OnyxElement {
 
     /**

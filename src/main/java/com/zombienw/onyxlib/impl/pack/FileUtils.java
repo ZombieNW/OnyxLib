@@ -10,6 +10,9 @@ import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+/**
+ * Helper class for managing file operations.
+ */
 public class FileUtils {
 
     public static void extractAssetsFromJar(Plugin plugin, Path destRoot) throws IOException {

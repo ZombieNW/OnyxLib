@@ -8,6 +8,10 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.function.Consumer;
 
+/**
+ * Represents a custom item.
+ * Acts as the builder for itself.
+ */
 public interface OnyxItem extends OnyxElement {
 
     /**

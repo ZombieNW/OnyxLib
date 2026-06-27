@@ -3,6 +3,9 @@ package com.zombienw.onyxlib.api;
 import com.zombienw.onyxlib.impl.registry.NamespaceRegistry;
 import org.bukkit.plugin.Plugin;
 
+/**
+ * The root for all of OnyxLib
+ */
 public class OnyxLib {
 
     private OnyxLib() {}

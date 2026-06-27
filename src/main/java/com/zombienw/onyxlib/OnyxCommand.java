@@ -19,6 +19,9 @@ import org.jspecify.annotations.NonNull;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Executes/completes the give and generatePack command.
+ */
 public class OnyxCommand implements CommandExecutor, TabCompleter {
 
     private final OnyxPlugin plugin;
@@ -44,7 +47,7 @@ public class OnyxCommand implements CommandExecutor, TabCompleter {
 
             sender.sendMessage(Component.text("Starting pack generation...", NamedTextColor.YELLOW));
 
-            // Run asynchronously to prevent freezing the server during heavy IO operations
+            // Run async
             plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
                 try {
                     PackGenerator generator = new PackGenerator(plugin);

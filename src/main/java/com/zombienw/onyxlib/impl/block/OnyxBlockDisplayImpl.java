@@ -4,6 +4,9 @@ import com.zombienw.onyxlib.api.block.OnyxBlockDisplay;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Implements OnyxBlockDisplays
+ */
 public class OnyxBlockDisplayImpl implements OnyxBlockDisplay {
 
     private final Map<Face, String> textures = new HashMap<>();

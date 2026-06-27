@@ -24,6 +24,9 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.BoundingBox;
 
+/**
+ * Event listener to manage the lifecycle of custom blocks.
+ */
 public class OnyxBlockListener implements Listener {
 
     private final OnyxPlugin plugin;

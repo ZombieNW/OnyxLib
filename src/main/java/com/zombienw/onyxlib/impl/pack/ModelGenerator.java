@@ -10,6 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Generates item/block models and custom item model definitions.
+ */
 public class ModelGenerator {
 
     public void processItem(Path root, OnyxItemImpl item) throws IOException {

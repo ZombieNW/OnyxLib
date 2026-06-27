@@ -2,8 +2,7 @@ package com.zombienw.onyxlib.api.block;
 
 /**
  * A builder interface used to map textures to the faces of a custom block.
- * <p>
- * Methods can be chained together. Texture conflicts are resolved by execution order.
+ * Texture conflicts are resolved by execution order.
  */
 public interface OnyxBlockDisplay {
 

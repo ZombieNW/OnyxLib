@@ -7,6 +7,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
+/**
+ * Generates resource pack related metadata.
+ */
 public class PackMetaGenerator {
 
     private static final int PACK_FORMAT = 84;

@@ -9,6 +9,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 
+/**
+ * Helper class for validating required/referenced assets used by elements.
+ */
 public class AssetValidator {
 
     public void validate(Path root, OnyxNamespaceImpl ns) throws FileNotFoundException {

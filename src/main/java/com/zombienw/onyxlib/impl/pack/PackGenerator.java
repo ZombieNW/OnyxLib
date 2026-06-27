@@ -11,6 +11,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+/**
+ * Orchestrates all the moving pieces of the pack generator.
+ */
 public class PackGenerator {
 
     private final OnyxPlugin corePlugin;

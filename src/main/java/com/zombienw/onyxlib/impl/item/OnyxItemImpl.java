@@ -11,6 +11,9 @@ import org.bukkit.persistence.PersistentDataType;
 
 import java.util.function.Consumer;
 
+/**
+ * Implements OnyxItems
+ */
 public class OnyxItemImpl implements OnyxItem {
 
     private final String id;

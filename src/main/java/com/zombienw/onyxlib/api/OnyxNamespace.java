@@ -8,6 +8,10 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.Collection;
 
+/**
+ * The root containers/registries for all custom content.
+ * They manage scope, id's, and interact with the resource pack generator.
+ */
 public interface OnyxNamespace {
 
     /**

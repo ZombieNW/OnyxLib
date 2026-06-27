@@ -20,6 +20,9 @@ import org.bukkit.persistence.PersistentDataType;
 import java.util.Map;
 import java.util.function.Consumer;
 
+/**
+ * Implements OnyxBlocks
+ */
 public class OnyxBlockImpl implements OnyxBlock {
 
     private final String id;
