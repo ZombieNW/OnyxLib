@@ -117,10 +117,12 @@ public class OnyxCommand implements CommandExecutor, TabCompleter {
             }
         }
 
-        // Filter completions based on what the user has already typed
         String currentArg = args[args.length - 1].toLowerCase();
         return completions.stream()
-                .filter(c -> c.toLowerCase().startsWith(currentArg))
+                .filter(c -> {
+                    String lowerC = c.toLowerCase();
+                    return lowerC.startsWith(currentArg) || lowerC.contains(":" + currentArg);
+                })
                 .toList();
     }
 }
