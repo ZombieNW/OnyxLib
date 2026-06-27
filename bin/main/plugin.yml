@@ -1,17 +1,17 @@
 name: OnyxLib
-version: "1.0-SNAPSHOT"
-main: com.zombienw.onyxLib.core.OnyxLib
-api-version: "1.21"
+version: "1.0"
+main: com.zombienw.onyxlib.OnyxPlugin
+api-version: "26.1"
 load: STARTUP
 
 commands:
-  onyx:
-    description: OnyxLib admin commands
-    usage: /onyx <give|generatepack>
-    permission: onyxlib.admin
-    permission-message: You don't have permission to use OnyxLib commands.
+    onyx:
+        description: OnyxLib admin commands
+        usage: /onyx <give|generatepack>
+        permission: onyxlib.admin
+        permission-message: You don't have permission to use OnyxLib commands.
 
 permissions:
-  onyxlib.admin:
-    description: Access to all OnyxLib admin commands
-    default: op
+    onyxlib.admin:
+        description: Access to all OnyxLib admin commands
+        default: op
