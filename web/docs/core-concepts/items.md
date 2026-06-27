@@ -33,14 +33,13 @@ ns.item("steel_sword")
     .texture("items/steel_sword")
     .itemMeta(meta -> {
         AttributeModifier modifier = new AttributeModifier(
-            UUID.randomUUID(),
-            "generic.attackDamage",
+            NamespacedKey.minecraft("attack_damage"),
             10.0,
             AttributeModifier.Operation.ADD_NUMBER,
-            EquipmentSlot.HAND
+            EquipmentSlotGroup.HAND
         );
 
-        meta.addAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE, modifier);
+        meta.addAttributeModifier(Attribute.ATTACK_DAMAGE, modifier);
     });
 ```
 
