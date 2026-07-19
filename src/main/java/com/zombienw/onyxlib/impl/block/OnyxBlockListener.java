@@ -5,6 +5,7 @@ import com.zombienw.onyxlib.api.block.OnyxBlock;
 import com.zombienw.onyxlib.api.event.OnyxBlockBreakEvent;
 import com.zombienw.onyxlib.api.event.OnyxBlockPlaceEvent;
 import com.zombienw.onyxlib.impl.registry.NamespaceRegistry;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
@@ -79,7 +80,11 @@ public class OnyxBlockListener implements Listener {
     public void onBlockBreak(BlockBreakEvent event) {
         Block block = event.getBlock();
         Location center = block.getLocation().add(0.5, 0.5, 0.5);
-        updateNearbyDisplays(center); // update lights
+
+
+        Bukkit.getRegionScheduler().run(plugin, center, (_) -> {
+            updateNearbyDisplays(center); // update lights
+        });
 
         // find first ItemDisplay with "onyx_id" key
         ItemDisplay targetDisplay = null;
