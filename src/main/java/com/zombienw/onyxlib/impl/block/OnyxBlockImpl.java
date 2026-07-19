@@ -151,10 +151,10 @@ public class OnyxBlockImpl implements OnyxBlock {
         Block targetBlock = location.getBlock();
         targetBlock.setType(this.baseBlock, false);
 
-//        Sample initial light
-//        Block blockAbove = targetBlock.getRelative(org.bukkit.block.BlockFace.UP);
-//        int blockLight = blockAbove.getLightFromBlocks();
-//        int skyLight = blockAbove.getLightFromSky();
+        // Sample initial light
+        Block blockAbove = targetBlock.getRelative(org.bukkit.block.BlockFace.UP);
+        int blockLight = blockAbove.getLightFromBlocks();
+        int skyLight = blockAbove.getLightFromSky();
 
         Location entityLoc = targetBlock.getLocation().add(0.5, 0.5, 0.5);
 
@@ -177,7 +177,8 @@ public class OnyxBlockImpl implements OnyxBlock {
             display.setInterpolationDuration(0);
             display.setTeleportDuration(0);
 
-            display.setBrightness(new org.bukkit.entity.Display.Brightness(11, 13));
+            // set display entity brightness to previously sampled values
+            display.setBrightness(new org.bukkit.entity.Display.Brightness(blockLight, skyLight));
         });
 
         return targetBlock;
