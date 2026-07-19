@@ -97,7 +97,10 @@ public class OnyxBlockDisplayImpl implements OnyxBlockDisplay {
         }
     }
 
-    // build read only map of textures
+    /**
+     * Builds a read-only map of block textures.
+     * @return String Map of textures
+     */
     public Map<String, String> buildTextureMap() {
         Map<String, String> namedMap = new HashMap<>();
         for (Map.Entry<Face, String> entry : textures.entrySet()) {

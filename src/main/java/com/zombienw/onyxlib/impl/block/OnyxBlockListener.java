@@ -35,6 +35,10 @@ public class OnyxBlockListener implements Listener {
         this.plugin = plugin;
     }
 
+    /**
+     * Handles when an OnyxBlock item is placed and places the physical OnyxBlock.
+     * @param event BlockPlaceEvent
+     */
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBlockPlace(BlockPlaceEvent event) {
         ItemStack item = event.getItemInHand();
@@ -73,6 +77,10 @@ public class OnyxBlockListener implements Listener {
         plugin.getServer().getPluginManager().callEvent(new OnyxBlockPlaceEvent(block, event.getPlayer(), onyxBlock));
     }
 
+    /**
+     * Checks if broken blocks are OnyxBlocks and breaks them.
+     * @param event
+     */
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBlockBreak(BlockBreakEvent event) {
         Block block = event.getBlock();
