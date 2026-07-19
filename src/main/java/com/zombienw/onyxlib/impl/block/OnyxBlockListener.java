@@ -11,6 +11,7 @@ import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Display;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.event.EventHandler;
@@ -31,6 +32,8 @@ public class OnyxBlockListener implements Listener {
 
     private final OnyxPlugin plugin;
 
+    private static final int LIGHT_RADIUS = 16;
+
     public OnyxBlockListener(OnyxPlugin plugin) {
         this.plugin = plugin;
     }
@@ -44,79 +47,106 @@ public class OnyxBlockListener implements Listener {
         ItemStack item = event.getItemInHand();
         if (!item.hasItemMeta()) return;
 
+        // Find the "onyx_id" key
         ItemMeta meta = item.getItemMeta();
-        if (meta == null) return;
-
-        // get element key
         NamespacedKey identityKey = meta.getPersistentDataContainer().getKeys().stream()
                 .filter(k -> k.getKey().equals("onyx_id"))
                 .findFirst()
                 .orElse(null);
         if (identityKey == null) return;
 
-        // find element
+        // Find block in registry from key
         String elementId = meta.getPersistentDataContainer().get(identityKey, PersistentDataType.STRING);
         if (elementId == null) return;
-
-        // find block
         NamespacedKey registryKey = new NamespacedKey(identityKey.getNamespace(), elementId);
         if (!(NamespaceRegistry.getElement(registryKey) instanceof OnyxBlock onyxBlock)) return;
 
-        // setup block
+        // Place the OnyxBlock
         Block block = event.getBlockPlaced();
         Location loc = block.getLocation();
 
-        // get player yaw
-        loc.setYaw(Math.round(event.getPlayer().getLocation().getYaw() / 90.0f) * 90.0f);
+        float playerYaw = event.getPlayer().getLocation().getYaw();
+        loc.setYaw(Math.round(playerYaw / 90.0f) * 90.0f);
         loc.setPitch(0.0f);
 
-        // place block
         onyxBlock.place(loc);
+        updateNearbyDisplays(loc);
 
-        // fire onyx event
+        // Dispatch event
         plugin.getServer().getPluginManager().callEvent(new OnyxBlockPlaceEvent(block, event.getPlayer(), onyxBlock));
     }
 
     /**
      * Checks if broken blocks are OnyxBlocks and breaks them.
-     * @param event
+     * @param event BlockBreakEvent
      */
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBlockBreak(BlockBreakEvent event) {
         Block block = event.getBlock();
         Location center = block.getLocation().add(0.5, 0.5, 0.5);
 
-        // find item display
-        ItemDisplay display = block.getWorld().getNearbyEntities(center, 0.1, 0.1, 0.1).stream()
-                .filter(ItemDisplay.class::isInstance)
-                .map(ItemDisplay.class::cast)
-                .filter(e -> e.getPersistentDataContainer().getKeys().stream().anyMatch(k -> k.getKey().equals("onyx_id")))
-                .findFirst()
-                .orElse(null);
+        // find first ItemDisplay with "onyx_id" key
+        ItemDisplay targetDisplay = null;
+        NamespacedKey identityKey = null;
 
-        if (display == null) return;
+        for (Entity entity : block.getWorld().getNearbyEntities(center, 0.1, 0.1, 0.1)) {
+            if (entity instanceof ItemDisplay display) {
+                identityKey = display.getPersistentDataContainer().getKeys().stream()
+                        .filter(k -> k.getKey().equals("onyx_id"))
+                        .findFirst()
+                        .orElse(null);
 
-        // get key
-        NamespacedKey identityKey = display.getPersistentDataContainer().getKeys().stream()
-                .filter(k -> k.getKey().equals("onyx_id"))
-                .findFirst()
-                .orElse(null);
-        if (identityKey == null) return;
+                if (identityKey != null) {
+                    targetDisplay = display;
+                    break;
+                }
+            }
+        }
 
-        String elementId = display.getPersistentDataContainer().get(identityKey, PersistentDataType.STRING);
+        if (targetDisplay == null) return;
+
+        // get element id using key
+        String elementId = targetDisplay.getPersistentDataContainer().get(identityKey, PersistentDataType.STRING);
         if (elementId == null) return;
 
-        // get block
+        // find block in registry from key
         NamespacedKey registryKey = new NamespacedKey(identityKey.getNamespace(), elementId);
         if (!(NamespaceRegistry.getElement(registryKey) instanceof OnyxBlock onyxBlock)) return;
 
         // dispatch event
         plugin.getServer().getPluginManager().callEvent(new OnyxBlockBreakEvent(block, event.getPlayer(), onyxBlock));
 
-        display.remove(); // remove entity
+        // remove entity
+        targetDisplay.remove();
 
-        // override drops
+        // drop item
+        updateNearbyDisplays(center); // update lights
         event.setDropItems(false);
         block.getWorld().dropItemNaturally(block.getLocation(), onyxBlock.create(1));
+    }
+
+    private void updateNearbyDisplays(Location origin) {
+        if (origin.getWorld() == null) return;
+
+        origin.getWorld().getNearbyEntities(
+                origin, LIGHT_RADIUS, LIGHT_RADIUS, LIGHT_RADIUS,
+                e -> e instanceof ItemDisplay display && hasOnyxId(display)
+        ).forEach(e -> updateDisplayLight((ItemDisplay) e));
+    }
+
+    private boolean hasOnyxId(ItemDisplay display) {
+        return display.getPersistentDataContainer().getKeys().stream()
+                .anyMatch(key -> key.getKey().equals("onyx_id"));
+    }
+
+    private void updateDisplayLight(ItemDisplay display) {
+        Location loc = display.getLocation();
+        Block block = loc.getBlock();
+
+        int blockLight = block.getLightFromBlocks();
+        int skyLight = block.getLightFromSky();
+        int combined = Math.max(blockLight, skyLight);
+
+        display.setBrightness(new Display.Brightness(combined, combined));
     }
 }

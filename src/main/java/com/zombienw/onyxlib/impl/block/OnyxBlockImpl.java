@@ -171,7 +171,6 @@ public class OnyxBlockImpl implements OnyxBlock {
             display.setItemStack(displayItem);
             display.setItemDisplayTransform(ItemDisplay.ItemDisplayTransform.FIXED);
 
-            // Matches the listener's exact key structure
             display.getPersistentDataContainer().set(onyxKey, PersistentDataType.STRING, this.id);
 
             display.setInterpolationDuration(0);
