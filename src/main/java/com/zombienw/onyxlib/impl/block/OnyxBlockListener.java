@@ -1,29 +1,25 @@
 package com.zombienw.onyxlib.impl.block;
 
 import com.zombienw.onyxlib.OnyxPlugin;
-import com.zombienw.onyxlib.api.OnyxElement;
 import com.zombienw.onyxlib.api.block.OnyxBlock;
 import com.zombienw.onyxlib.api.event.OnyxBlockBreakEvent;
 import com.zombienw.onyxlib.api.event.OnyxBlockPlaceEvent;
 import com.zombienw.onyxlib.impl.registry.NamespaceRegistry;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
-import org.bukkit.entity.Display;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockPhysicsEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.util.BoundingBox;
+
+import static com.zombienw.onyxlib.impl.block.OnyxBlockUtils.*;
 
 /**
  * Event listener to manage the lifecycle of custom blocks.
@@ -31,8 +27,6 @@ import org.bukkit.util.BoundingBox;
 public class OnyxBlockListener implements Listener {
 
     private final OnyxPlugin plugin;
-
-    private static final int LIGHT_RADIUS = 16;
 
     public OnyxBlockListener(OnyxPlugin plugin) {
         this.plugin = plugin;
@@ -44,6 +38,8 @@ public class OnyxBlockListener implements Listener {
      */
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBlockPlace(BlockPlaceEvent event) {
+        updateNearbyDisplays(event.getBlock().getLocation());
+
         ItemStack item = event.getItemInHand();
         if (!item.hasItemMeta()) return;
 
@@ -70,7 +66,6 @@ public class OnyxBlockListener implements Listener {
         loc.setPitch(0.0f);
 
         onyxBlock.place(loc);
-        updateNearbyDisplays(loc);
 
         // Dispatch event
         plugin.getServer().getPluginManager().callEvent(new OnyxBlockPlaceEvent(block, event.getPlayer(), onyxBlock));
@@ -84,6 +79,7 @@ public class OnyxBlockListener implements Listener {
     public void onBlockBreak(BlockBreakEvent event) {
         Block block = event.getBlock();
         Location center = block.getLocation().add(0.5, 0.5, 0.5);
+        updateNearbyDisplays(center); // update lights
 
         // find first ItemDisplay with "onyx_id" key
         ItemDisplay targetDisplay = null;
@@ -120,33 +116,7 @@ public class OnyxBlockListener implements Listener {
         targetDisplay.remove();
 
         // drop item
-        updateNearbyDisplays(center); // update lights
         event.setDropItems(false);
         block.getWorld().dropItemNaturally(block.getLocation(), onyxBlock.create(1));
-    }
-
-    private void updateNearbyDisplays(Location origin) {
-        if (origin.getWorld() == null) return;
-
-        origin.getWorld().getNearbyEntities(
-                origin, LIGHT_RADIUS, LIGHT_RADIUS, LIGHT_RADIUS,
-                e -> e instanceof ItemDisplay display && hasOnyxId(display)
-        ).forEach(e -> updateDisplayLight((ItemDisplay) e));
-    }
-
-    private boolean hasOnyxId(ItemDisplay display) {
-        return display.getPersistentDataContainer().getKeys().stream()
-                .anyMatch(key -> key.getKey().equals("onyx_id"));
-    }
-
-    private void updateDisplayLight(ItemDisplay display) {
-        Location loc = display.getLocation();
-        Block block = loc.getBlock();
-
-        int blockLight = block.getLightFromBlocks();
-        int skyLight = block.getLightFromSky();
-        int combined = Math.max(blockLight, skyLight);
-
-        display.setBrightness(new Display.Brightness(combined, combined));
     }
 }

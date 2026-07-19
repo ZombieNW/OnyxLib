@@ -2,23 +2,21 @@ package com.zombienw.onyxlib.impl.block;
 
 import com.zombienw.onyxlib.api.block.OnyxBlock;
 import com.zombienw.onyxlib.api.block.OnyxBlockDisplay;
-import com.zombienw.onyxlib.api.item.OnyxItem;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
-import org.bukkit.entity.Display;
 import org.bukkit.entity.ItemDisplay;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.util.Map;
 import java.util.function.Consumer;
+
+import static com.zombienw.onyxlib.impl.block.OnyxBlockUtils.updateDisplayLight;
 
 /**
  * Implements OnyxBlocks
@@ -151,10 +149,6 @@ public class OnyxBlockImpl implements OnyxBlock {
         Block targetBlock = location.getBlock();
         targetBlock.setType(this.baseBlock, false);
 
-        // Sample light
-        int blockLight = targetBlock.getLightFromBlocks();
-        int skyLight = targetBlock.getLightFromSky();
-
         Location entityLoc = targetBlock.getLocation().add(0.5, 0.5, 0.5);
 
         if (this.rotates) {
@@ -176,8 +170,7 @@ public class OnyxBlockImpl implements OnyxBlock {
             display.setInterpolationDuration(0);
             display.setTeleportDuration(0);
 
-            // set display entity brightness to previously sampled values
-            display.setBrightness(new org.bukkit.entity.Display.Brightness(blockLight, skyLight));
+            updateDisplayLight(display);
         });
 
         return targetBlock;
