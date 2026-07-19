@@ -147,14 +147,13 @@ public class OnyxBlockImpl implements OnyxBlock {
         if (location == null || location.getWorld() == null) throw new IllegalArgumentException("Location and world cannot be null");
         if (this.baseBlock == null) throw new IllegalStateException("Cannot place OnyxBlock '" + id + "' without a defined baseBlock().");
 
-        // Place block
+        // Place physical block
         Block targetBlock = location.getBlock();
         targetBlock.setType(this.baseBlock, false);
 
-        // Sample initial light
-        Block blockAbove = targetBlock.getRelative(org.bukkit.block.BlockFace.UP);
-        int blockLight = blockAbove.getLightFromBlocks();
-        int skyLight = blockAbove.getLightFromSky();
+        // Sample light
+        int blockLight = targetBlock.getLightFromBlocks();
+        int skyLight = targetBlock.getLightFromSky();
 
         Location entityLoc = targetBlock.getLocation().add(0.5, 0.5, 0.5);
 
@@ -166,6 +165,7 @@ public class OnyxBlockImpl implements OnyxBlock {
             entityLoc.setPitch(0.0f);
         }
 
+        // Spawn ItemDisplay
         entityLoc.getWorld().spawn(entityLoc, ItemDisplay.class, display -> {
             ItemStack displayItem = this.create(1);
             display.setItemStack(displayItem);
