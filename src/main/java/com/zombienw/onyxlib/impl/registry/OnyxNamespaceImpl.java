@@ -49,43 +49,41 @@ public class OnyxNamespaceImpl implements OnyxNamespace {
 
     @Override
     public OnyxItem item(String id) {
-        if (this.isLocked) throwLockedException(id);
+        OnyxItem existing = (OnyxItem) allElements.get(id);
+        if (existing != null) {
+            return existing;
+        }
 
-        if (this.allElements.containsKey(id)) {
-            throw new IllegalArgumentException("Conflict: Cannot register item '" + id +
-                    "' because this ID already exists in namespace '" + plugin.getName() + "'.");
+        if (this.isLocked) {
+            throwLockedException(id);
         }
 
         NamespacedKey itemKey = new NamespacedKey(this.plugin, id);
         OnyxItemImpl item = new OnyxItemImpl(id, itemKey, this.onyxKey);
 
-        OnyxItemImpl existing = registeredItems.putIfAbsent(id, item);
-        if (existing != null) {
-            return existing;
-        }
-
+        registeredItems.put(id, item);
         allElements.put(id, item);
+
         return item;
     }
 
     @Override
     public OnyxBlock block(String id) {
-        if (this.isLocked) throwLockedException(id);
+        OnyxBlock existing = (OnyxBlock) allElements.get(id);
+        if (existing != null) {
+            return existing;
+        }
 
-        if (this.allElements.containsKey(id)) {
-            throw new IllegalArgumentException("Conflict: Cannot register block '" + id +
-                    "' because this ID already exists in namespace '" + plugin.getName() + "'.");
+        if (this.isLocked) {
+            throwLockedException(id);
         }
 
         NamespacedKey blockKey = new NamespacedKey(this.plugin, id);
         OnyxBlockImpl block = new OnyxBlockImpl(id, blockKey, this.onyxKey);
 
-        OnyxBlockImpl existing = registeredBlocks.putIfAbsent(id, block);
-        if (existing != null) {
-            return existing;
-        }
-
+        registeredBlocks.put(id, block);
         allElements.put(id, block);
+
         return block;
     }
 
