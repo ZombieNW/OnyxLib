@@ -39,6 +39,9 @@ public class OnyxBlockListener implements Listener {
      */
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBlockPlace(BlockPlaceEvent event) {
+        Bukkit.getRegionScheduler().run(plugin, event.getBlock().getLocation(), (_) -> {
+            updateNearbyDisplays(event.getBlock().getLocation());
+        });
         updateNearbyDisplays(event.getBlock().getLocation());
 
         ItemStack item = event.getItemInHand();
