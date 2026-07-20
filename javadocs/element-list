@@ -1,0 +1,9 @@
+com.zombienw.onyxlib
+com.zombienw.onyxlib.api
+com.zombienw.onyxlib.api.block
+com.zombienw.onyxlib.api.event
+com.zombienw.onyxlib.api.item
+com.zombienw.onyxlib.impl.block
+com.zombienw.onyxlib.impl.item
+com.zombienw.onyxlib.impl.pack
+com.zombienw.onyxlib.impl.registry
