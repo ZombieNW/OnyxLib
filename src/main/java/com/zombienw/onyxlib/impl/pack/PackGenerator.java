@@ -10,6 +10,9 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Orchestrates all the moving pieces of the pack generator.
@@ -30,26 +33,37 @@ public class PackGenerator {
 
     public String generate() throws IOException {
         Path tempDir = Files.createTempDirectory("onyxlib-pack-temp-");
+        Set<Plugin> extractedPlugins = new HashSet<>();
+        Collection<OnyxNamespaceImpl> namespaces = NamespaceRegistry.getAllNamespaces();
         int totalAssets = 0;
 
         try {
+            Files.deleteIfExists(outputFile.toPath());
+
             metaGenerator.generate(corePlugin, tempDir);
 
-            for (OnyxNamespaceImpl ns : NamespaceRegistry.getAllNamespaces()) {
+            for (OnyxNamespaceImpl ns : namespaces) {
                 Plugin plugin = ns.getPlugin();
 
-                FileUtils.extractAssetsFromJar(plugin, tempDir);
-                validator.validate(tempDir, ns);
+                // Pull all assets
+                if (extractedPlugins.add(plugin)) {
+                    FileUtils.extractAssetsFromJar(plugin, tempDir);
+                }
 
+                // Generate Items
                 for (OnyxItemImpl item : ns.getItems()) {
                     modelGenerator.processItem(tempDir, item);
                     totalAssets++;
                 }
 
+                // Generate Blocks
                 for (OnyxBlockImpl block : ns.getBlocks()) {
                     modelGenerator.processBlock(tempDir, block);
                     totalAssets++;
                 }
+
+                // Make sure all referenced models/textures were found
+                validator.validate(tempDir, ns);
             }
 
             if (totalAssets > 0) {

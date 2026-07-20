@@ -2,6 +2,7 @@ package com.zombienw.onyxlib.impl.pack;
 
 import org.bukkit.plugin.Plugin;
 import java.io.*;
+import java.net.URISyntaxException;
 import java.nio.file.*;
 import java.util.Comparator;
 import java.util.Enumeration;
@@ -16,7 +17,12 @@ import java.util.zip.ZipOutputStream;
 public class FileUtils {
 
     public static void extractAssetsFromJar(Plugin plugin, Path destRoot) throws IOException {
-        File pluginFile = new File(plugin.getClass().getProtectionDomain().getCodeSource().getLocation().getPath());
+        File pluginFile;
+        try {
+            pluginFile = Path.of(plugin.getClass().getProtectionDomain().getCodeSource().getLocation().toURI()).toFile();
+        } catch (URISyntaxException e) {
+            throw new IOException("Failed to resolve plugin JAR URI path", e);
+        }
 
         try (JarFile jar = new JarFile(pluginFile)) {
             Enumeration<JarEntry> entries = jar.entries();
@@ -37,19 +43,19 @@ public class FileUtils {
 
     public static void zipDirectory(Path source, Path destZip) throws IOException {
         Files.deleteIfExists(destZip);
-        Files.createDirectories(destZip.getParent());
+        if (destZip.getParent() != null) {
+            Files.createDirectories(destZip.getParent());
+        }
 
-        try (ZipOutputStream zos = new ZipOutputStream(new BufferedOutputStream(Files.newOutputStream(destZip)))) {
-            Files.walk(source).filter(p -> !Files.isDirectory(p)).forEach(p -> {
+        try (ZipOutputStream zos = new ZipOutputStream(new BufferedOutputStream(Files.newOutputStream(destZip)));
+             var walk = Files.walk(source)) {
+
+            for (Path p : (Iterable<Path>) walk.filter(p -> !Files.isDirectory(p))::iterator) {
                 ZipEntry zipEntry = new ZipEntry(source.relativize(p).toString().replace('\\', '/'));
-                try {
-                    zos.putNextEntry(zipEntry);
-                    Files.copy(p, zos);
-                    zos.closeEntry();
-                } catch (IOException e) {
-                    throw new UncheckedIOException(e);
-                }
-            });
+                zos.putNextEntry(zipEntry);
+                Files.copy(p, zos);
+                zos.closeEntry();
+            }
         }
     }
 
@@ -57,9 +63,10 @@ public class FileUtils {
         if (!Files.exists(dir)) return;
 
         try (var walk = Files.walk(dir)) {
-            walk.sorted(Comparator.reverseOrder())
-                    .map(Path::toFile)
-                    .forEach(File::delete);
+            var paths = walk.sorted(Comparator.reverseOrder()).toList();
+            for (Path path : paths) {
+                Files.delete(path);
+            }
         }
     }
 }

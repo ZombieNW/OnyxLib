@@ -22,17 +22,19 @@ public class ModelGenerator {
 
         if (targetModelPath == null && item.getTexturePath() != null) {
             targetModelPath = "item/" + id;
-            Path modelDest = root.resolve("assets/" + namespace + "/models/" + targetModelPath + ".json");
+            Path modelDest = root.resolve(Path.of("assets", namespace, "models", targetModelPath + ".json"));
             Files.createDirectories(modelDest.getParent());
+
+            String textureRef = formatAssetRef(namespace, item.getTexturePath());
 
             String modelJson = """
                 {
                   "parent": "minecraft:item/generated",
                   "textures": {
-                    "layer0": "%s:%s"
+                    "layer0": "%s"
                   }
                 }
-                """.formatted(namespace, item.getTexturePath());
+                """.formatted(textureRef);
 
             Files.writeString(modelDest, modelJson);
         }
@@ -49,7 +51,7 @@ public class ModelGenerator {
 
         if (targetModelPath == null && block.getBlockDisplay() != null) {
             targetModelPath = "item/" + id;
-            Path modelDest = root.resolve("assets/" + namespace + "/models/" + targetModelPath + ".json");
+            Path modelDest = root.resolve(Path.of("assets", namespace, "models", targetModelPath + ".json"));
             Files.createDirectories(modelDest.getParent());
 
             Map<String, String> textures = ((OnyxBlockDisplayImpl) block.getBlockDisplay()).buildTextureMap();
@@ -62,40 +64,53 @@ public class ModelGenerator {
     }
 
     private void createItemDefinitionJson(Path root, String namespace, String id, String modelPath) throws IOException {
-        Path defPath = root.resolve("assets/" + namespace + "/items/" + id + ".json");
+        Path defPath = root.resolve(Path.of("assets", namespace, "items", id + ".json"));
         Files.createDirectories(defPath.getParent());
+
+        String modelRef = formatAssetRef(namespace, modelPath);
 
         String itemJson = """
             {
               "model": {
                 "type": "minecraft:model",
-                "model": "%s:%s"
+                "model": "%s"
               }
             }
-            """.formatted(namespace, modelPath);
+            """.formatted(modelRef);
 
         Files.writeString(defPath, itemJson);
     }
 
     private String buildBlockModelJson(String namespace, Map<String, String> rawTextures) {
+        if (rawTextures.isEmpty()) {
+            throw new IllegalStateException("Cannot build block model JSON with an empty texture map!");
+        }
+
         List<String> textureLines = new ArrayList<>();
         List<String> faceLines = new ArrayList<>();
         String firstTexture = rawTextures.values().iterator().next();
 
-        textureLines.add(String.format("        \"particle\": \"%s:%s\"", namespace, firstTexture));
+        textureLines.add(String.format("        \"particle\": \"%s\"", formatAssetRef(namespace, firstTexture)));
 
         for (Map.Entry<String, String> entry : rawTextures.entrySet()) {
             String mcFace = entry.getKey().equalsIgnoreCase("top") ? "up" :
                     entry.getKey().equalsIgnoreCase("bottom") ? "down" :
                             entry.getKey().toLowerCase();
 
-            String textureRef = namespace + ":" + entry.getValue();
+            String textureRef = formatAssetRef(namespace, entry.getValue());
 
             textureLines.add(String.format("        \"%s\": \"%s\"", mcFace, textureRef));
             faceLines.add(String.format("                \"%s\": { \"uv\": [0, 0, 16, 16], \"texture\": \"#%s\" }", mcFace, mcFace));
         }
 
         return getBlockModelTemplate(String.join(",\n", textureLines), String.join(",\n", faceLines));
+    }
+
+    private String formatAssetRef(String defaultNamespace, String path) {
+        if (path.contains(":")) {
+            return path;
+        }
+        return defaultNamespace + ":" + path;
     }
 
     private String getBlockModelTemplate(String texturesJson, String facesJson) {
