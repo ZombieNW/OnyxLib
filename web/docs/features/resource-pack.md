@@ -1,7 +1,7 @@
 ---
 id: resource-pack
 title: Resource Pack Generator
-sidebar_position: 4
+sidebar_position: 5
 ---
 
 # Resource Pack Generator
