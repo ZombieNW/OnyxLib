@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'com.zombienw'
-version = '1.0'
+version = '1.1'
 
 repositories {
     mavenCentral()
@@ -51,7 +51,7 @@ tasks.withType(Javadoc).configureEach {
         charSet = 'UTF-8'
         addBooleanOption('Xdoclint:none', true)
 
-        links("https://jd.papermc.io/paper/26.1.2/")
+        links("https://jd.papermc.io/paper/26.1/")
     }
 
     doFirst {
@@ -73,8 +73,6 @@ publishing {
         mavenJava(MavenPublication) {
             from components.java
 
-            // These let dependents reference your artifact as:
-            // com.zombienw:onyxlib:1.0
             groupId = 'com.zombienw'
             artifactId = 'onyxlib'
             version = version
@@ -94,7 +92,7 @@ publishing {
 }
 
 jar {
-    archiveFileName = 'OnyxLib.jar'
+    archiveBaseName = 'OnyxLib'
 }
 
 tasks.register('copyToTestServer', Copy) {
