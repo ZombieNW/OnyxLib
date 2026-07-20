@@ -51,7 +51,7 @@ tasks.withType(Javadoc).configureEach {
         charSet = 'UTF-8'
         addBooleanOption('Xdoclint:none', true)
 
-        links("https://jd.papermc.io/paper/26.1/")
+        links("https://jd.papermc.io/paper/26.1.2/")
     }
 
     doFirst {
