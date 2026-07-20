@@ -1,6 +1,7 @@
 package com.zombienw.onyxlib.impl.block;
 
 import com.zombienw.onyxlib.api.block.OnyxBlockDisplay;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -91,10 +92,7 @@ public class OnyxBlockDisplayImpl implements OnyxBlockDisplay {
         return this.textures.get(face);
     }
 
-    private void checkExtension(String path) {
-        if (path == null) {
-            throw new IllegalArgumentException("Texture path cannot be null");
-        }
+    private void checkExtension(@NotNull String path) {
         if (path.endsWith(".png")) {
             throw new IllegalArgumentException("Texture path for block must not include the .png extension.");
         }

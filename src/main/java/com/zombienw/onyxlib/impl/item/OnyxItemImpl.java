@@ -8,6 +8,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
 
@@ -40,6 +41,9 @@ public class OnyxItemImpl implements OnyxItem {
 
     @Override
     public OnyxItem baseItem(Material material) {
+        if (material == null || material.isAir()) {
+            throw new IllegalArgumentException("Base material for item '" + id + "' cannot be null or AIR!");
+        }
         this.baseMaterial = material;
         return this;
     }
@@ -58,7 +62,7 @@ public class OnyxItemImpl implements OnyxItem {
     }
 
     @Override
-    public OnyxItem texture(String path) {
+    public OnyxItem texture(@NotNull String path) {
         // check for dev adding extension
         if (path.endsWith(".png")) {
             throw new IllegalArgumentException(
@@ -72,7 +76,7 @@ public class OnyxItemImpl implements OnyxItem {
     }
 
     @Override
-    public OnyxItem model(String path) {
+    public OnyxItem model(@NotNull String path) {
         // check for dev adding extension
         if (path.endsWith(".json")) {
             throw new IllegalArgumentException(
@@ -106,6 +110,9 @@ public class OnyxItemImpl implements OnyxItem {
         ItemMeta meta = stack.getItemMeta();
 
         if (meta != null) {
+            if (this.metaConsumer != null) {
+                this.metaConsumer.accept(meta);
+            }
 
             if (this.displayName != null) {
                 meta.displayName(this.displayName);
@@ -113,10 +120,6 @@ public class OnyxItemImpl implements OnyxItem {
 
             meta.setItemModel(this.elementKey);
             meta.getPersistentDataContainer().set(this.onyxKey, PersistentDataType.STRING, this.id);
-
-            if (this.metaConsumer != null) {
-                this.metaConsumer.accept(meta);
-            }
 
             stack.setItemMeta(meta);
         }

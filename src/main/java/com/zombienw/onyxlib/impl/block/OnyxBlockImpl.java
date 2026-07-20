@@ -12,6 +12,7 @@ import org.bukkit.entity.ItemDisplay;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 import java.util.function.Consumer;
@@ -69,7 +70,7 @@ public class OnyxBlockImpl implements OnyxBlock {
     }
 
     @Override
-    public OnyxBlock model(String path) {
+    public OnyxBlock model(@NotNull String path) {
         // check for dev adding extension
         if (path.endsWith(".json")) {
             throw new IllegalArgumentException(
