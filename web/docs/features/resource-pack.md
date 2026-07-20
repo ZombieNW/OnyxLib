@@ -13,6 +13,7 @@ Resource pack generation is a core feature of OnyxLib. Need not the worries of c
 - **Automatic ID Assignment:** OnyxLib automatically gives every registered item a unique identifier based on its namespace and ID.
 - **Texture Compilation:** OnyxLib reads your code's `.texture()` paths to find the matching image files inside your plugin's JAR.
 - **Custom Model Creation:** OnyxLib uses item identifiers to generate the required custom model data JSON files.
+- **Asset Validation:** OnyxLib checks all referenced assets prior to generation and will notify the console of missing texture or JSON files.
 - **Pack Generation:** OnyxLib bundles all models, textures, and JSON files into a single resource pack.
 
 ## Directory Structure
@@ -24,9 +25,13 @@ src/main/resources/
 └── assets/
     └── myplugin/
         └── textures/
-            └── items/
-                └── strawberry.png
+            ├── items/
+            │   └── strawberry.png
+            └── blocks/
+                └── rainbow_ore.png
 ```
+
+*If you provide custom models using `.model()`, ensure your JSON files are placed under `assets/<namespace>/models/`.*
 
 ## Generating the Pack
 
@@ -36,4 +41,4 @@ Trigger the generator from the server console or in-game as an admin (`onyxlib.a
 /onyx generatePack
 ```
 
-This will run in the background. Once complete, a `resourcepack.zip` file will be generated inside in the `plugins/OnyxLib/` folder. Then use `server.properties` or a dedicated plugin to host the resource pack. :D
+This will run in the background. Once complete, an `OnyxLib-generated.zip` file will be generated inside the `plugins/OnyxLib/` folder. Then use `server.properties` or a dedicated plugin to host the resource pack. :D

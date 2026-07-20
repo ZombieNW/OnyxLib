@@ -10,7 +10,7 @@ An OnyxLib item is a wrapper built around a base `Material`.
 
 ## Registration
 
-Items are created through your plugin's namespace. `baseItem` is the only strictly required property for an item to function.
+Items are created through your plugin's namespace. `baseItem` is the only strictly required property for an item to function (though it can't be `null` or `AIR`).
 
 ```java
 OnyxNamespace ns = OnyxLib.namespace(this);
@@ -22,6 +22,14 @@ ns.item("strawberry")
 ```
 
 **Note:** `.texture()` accepts the relative path to the image file inside your plugin's `assets/<namespace>/textures/` directory. **Do not** include the `.png` extension in the string or you will get an error.
+
+### Custom Models
+
+*Alternatively*, if you have your own JSON item model, use `.model("items/strawberry_model")` (omitting the `.json` extension) to set the item's model manually. Make sure referenced textures are relative to the namespace. 
+
+```json
+"textures": { "0": "myplugin:item/cool_sword", "particle": "myplugin:item/cool_sword" },
+```
 
 ## ItemMeta Escape Hatch
 
