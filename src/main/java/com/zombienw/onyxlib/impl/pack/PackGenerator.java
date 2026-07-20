@@ -28,7 +28,7 @@ public class PackGenerator {
 
     public PackGenerator(OnyxPlugin corePlugin) {
         this.corePlugin = corePlugin;
-        this.outputFile = new File(corePlugin.getDataFolder(), "resourcepack.zip");
+        this.outputFile = new File(corePlugin.getDataFolder(), "OnyxLib-generated.zip");
     }
 
     public String generate() throws IOException {
