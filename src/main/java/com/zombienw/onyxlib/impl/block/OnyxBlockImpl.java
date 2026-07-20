@@ -107,8 +107,8 @@ public class OnyxBlockImpl implements OnyxBlock {
     }
 
     @Override
-    public OnyxBlock rotates(Boolean rotates) {
-        this.rotates = rotates != null && rotates;
+    public OnyxBlock rotates(boolean rotates) {
+        this.rotates = rotates;
         return this;
     }
 
@@ -147,7 +147,9 @@ public class OnyxBlockImpl implements OnyxBlock {
 
         // Place physical block
         Block targetBlock = location.getBlock();
-        targetBlock.setType(this.baseBlock, false);
+        if (targetBlock.getBlockData().getMaterial() != this.baseBlock) {
+            targetBlock.setType(this.baseBlock, false);
+        }
 
         Location entityLoc = targetBlock.getLocation().add(0.5, 0.5, 0.5);
 

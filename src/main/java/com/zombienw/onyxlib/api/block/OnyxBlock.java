@@ -60,7 +60,7 @@ public interface OnyxBlock extends OnyxElement {
      * @param rotates True if the custom block should face the player when placed, false otherwise.
      * @return This OnyxBlock instance.
      */
-    OnyxBlock rotates(Boolean rotates);
+    OnyxBlock rotates(boolean rotates);
 
     /**
      * Places an OnyxBlock at a given location.

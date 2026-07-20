@@ -8,7 +8,12 @@ import org.bukkit.entity.ItemDisplay;
 
 public class OnyxBlockUtils {
 
-    private static final int LIGHT_RADIUS = 16;
+    private static final int LIGHT_RADIUS = 8;
+    private static final int[][] DIRECTIONS = {
+            {0, 1, 0},  {0, -1, 0},
+            {1, 0, 0},  {-1, 0, 0},
+            {0, 0, 1},  {0, 0, -1}
+    };
 
     /**
      * Update all nearby OnyxBlock ItemDisplay entity light values.
@@ -61,13 +66,7 @@ public class OnyxBlockUtils {
         int maxBlockLight = centerBlock.getLightFromBlocks();
         int maxSkyLight = centerBlock.getLightFromSky();
 
-        int[][] directions = {
-                {0, 1, 0},  {0, -1, 0},
-                {1, 0, 0},  {-1, 0, 0},
-                {0, 0, 1},  {0, 0, -1}
-        };
-
-        for (int[] offset : directions) {
+        for (int[] offset : DIRECTIONS) {
             Block neighbor = world.getBlockAt(x + offset[0], y + offset[1], z + offset[2]);
             maxBlockLight = Math.max(maxBlockLight, neighbor.getLightFromBlocks());
             maxSkyLight = Math.max(maxSkyLight, neighbor.getLightFromSky());

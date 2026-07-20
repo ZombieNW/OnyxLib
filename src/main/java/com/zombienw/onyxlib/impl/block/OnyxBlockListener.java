@@ -42,7 +42,6 @@ public class OnyxBlockListener implements Listener {
         Bukkit.getRegionScheduler().run(plugin, event.getBlock().getLocation(), (_) -> {
             updateNearbyDisplays(event.getBlock().getLocation());
         });
-        updateNearbyDisplays(event.getBlock().getLocation());
 
         ItemStack item = event.getItemInHand();
         if (!item.hasItemMeta()) return;

@@ -1,6 +1,8 @@
 package com.zombienw.onyxlib.impl.block;
 
 import com.zombienw.onyxlib.api.block.OnyxBlockDisplay;
+
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -9,7 +11,7 @@ import java.util.Map;
  */
 public class OnyxBlockDisplayImpl implements OnyxBlockDisplay {
 
-    private final Map<Face, String> textures = new HashMap<>();
+    private final Map<Face, String> textures = new EnumMap<>(Face.class);
 
     // Shortcuts
 
@@ -90,10 +92,11 @@ public class OnyxBlockDisplayImpl implements OnyxBlockDisplay {
     }
 
     private void checkExtension(String path) {
+        if (path == null) {
+            throw new IllegalArgumentException("Texture path cannot be null");
+        }
         if (path.endsWith(".png")) {
-            throw new IllegalArgumentException(
-                    "Texture path for block must not include the .png extension. "
-            );
+            throw new IllegalArgumentException("Texture path for block must not include the .png extension.");
         }
     }
 
@@ -108,6 +111,6 @@ public class OnyxBlockDisplayImpl implements OnyxBlockDisplay {
                 namedMap.put(entry.getKey().name().toLowerCase(), entry.getValue());
             }
         }
-        return namedMap;
+        return Map.copyOf(namedMap);
     }
 }
