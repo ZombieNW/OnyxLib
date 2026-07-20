@@ -6,7 +6,7 @@ sidebar_position: 2
 
 # Namespaces
 
-Namespaces are the root containers/registries for all custom content. They handle scope, id's, and interact with the resource pack pipeline.
+Namespaces are the root containers/registries for all custom content. They handle scope, id's, and interact with the resource pack generator.
 
 ## Creating a Namespace
 

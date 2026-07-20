@@ -6,7 +6,7 @@ sidebar_position: 4
 
 # Custom Blocks
 
-An OnyxLib `OnyxBlock` is a wrapper built on a "real" `Material` block and an `ItemDisplay` display entity complete with dynamic lighting updating and rotation logic.
+An `OnyxBlock` is a wrapper built on a "real" `Material` block and an `ItemDisplay` display entity complete with dynamic lighting updating and rotation logic.
 
 ## Registration
 
@@ -37,31 +37,31 @@ ns.block("marble")
 
 #### blockDisplay Functions
 ```java
-    // All six faces
-    OnyxBlockDisplay all(String);
+// All six faces
+OnyxBlockDisplay all(String);
 
-    // North, East, South, & West
-    OnyxBlockDisplay sides(String);
+// North, East, South, & West
+OnyxBlockDisplay sides(String);
 
-    // Top & Bottom
-    OnyxBlockDisplay vertical(String);
+// Top & Bottom
+OnyxBlockDisplay vertical(String);
 
-    // Individual Sides
-    OnyxBlockDisplay top(String);
-    OnyxBlockDisplay bottom(String);
-    OnyxBlockDisplay north(String);
-    OnyxBlockDisplay east(String);
-    OnyxBlockDisplay south(String);
-    OnyxBlockDisplay west(String);
+// Individual Sides
+OnyxBlockDisplay top(String);
+OnyxBlockDisplay bottom(String);
+OnyxBlockDisplay north(String);
+OnyxBlockDisplay east(String);
+OnyxBlockDisplay south(String);
+OnyxBlockDisplay west(String);
 ```
 
 **Note:** All six block faces must be assigned a texture, or the asset validator will throw an error.
 
 ## Placing & Breaking
 
-Custom blocks are placed in the world via normal player interactions or programmatically using the `.place(Location)` method.
+Custom blocks are placed in the world via normal player interactions or programmatically using the `.place(Location)` method. OnyxLib handles the lifecycle automatically, tracking physical blocks and their `ItemDisplay` counterparts.
 
-OnyxLib handles the lifecycle automatically, tracking physical blocks and their `ItemDisplay` counterparts. Two new Bukkit events are exposed to you for your programming pleasure.
+Two new Bukkit events are exposed to you for your programming pleasure.
 
 * `OnyxBlockBreakEvent(Block, Player, OnyxBlock)`
 * `OnyxBlockPlaceEvent(Block, Player, OnyxBlock)`
