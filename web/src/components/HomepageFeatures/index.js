@@ -24,20 +24,20 @@ const FeatureList = [
             </>
         ),
     },
-    // {
-    //   title: 'Custom Blocks',
-    //   image: require('@site/static/img/block.png').default,
-    //   description: (
-    //     <>
-    //       Using different techniques and registered events, the illusion of custom blocks is possible with OnyxLib. And it's super easy!
-    //     </>
-    //   ),
-    // },
+    {
+      title: 'Custom Blocks',
+      image: require('@site/static/img/block.png').default,
+      description: (
+        <>
+          Using events, entities, and magic, the illusion of custom blocks is possible with OnyxLib. And it's super easy!
+        </>
+      ),
+    },
 ];
 
 function Feature({ image, title, description }) {
     return (
-        <div className={clsx("col col--6")}>
+        <div className={clsx("col col--4")}>
             <div className="text--center">
                 <img src={image} className={styles.featureSvg} alt={title} />
             </div>
