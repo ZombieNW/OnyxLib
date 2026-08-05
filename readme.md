@@ -9,7 +9,6 @@ OnyxLib is a work-in-progress library for creating server-side content to use on
 - Modular architecture: each plugin built with OnyxLib acts as an independent content pack.
 - Automatic asset merge: a utility collects and merges installed pack assets into a single usable package.
 - API surface for registering custom items, blocks, recipes, and resources.
-- Fluent custom GUI (chest menu) builder for interactive inventories.
 - Server-side only, no client mods required.
 
 ## Requirements
@@ -27,10 +26,6 @@ Example dependency and packaging details will be provided once official artifact
 ## Quick usage
 - /onyx generatepack  
   Gathers and merges all installed content packs’ assets into a single package ready for the server.
-- /onyx give \<namespace:item_id\> [amount]  
-  Gives the sender a registered OnyxLib item/block.
-- /onyx gui  
-  **Operator only.** Opens an in-game menu listing every registered OnyxLib element across all namespaces; clicking an item gives you one.
 
 ## Developing a content pack
 Recommended structure:
@@ -49,28 +44,6 @@ During plugin initialization, register your custom items/blocks via OnyxLib’s 
 3. Provide related resources under `assets/` and `data/`.
 
 Concrete code examples and templates will be added to the documentation as the project matures.
-
-## Custom GUIs
-OnyxLib includes a fluent builder for custom inventory GUIs (chest menus), so plugins don't need to hand-roll `InventoryHolder`/`InventoryClickEvent` boilerplate.
-
-```java
-OnyxGui menu = OnyxLib.gui("My Shop", 3)
-    .fill(new ItemStack(Material.GRAY_STAINED_GLASS_PANE))
-    .item(13, new ItemStack(Material.DIAMOND), click -> {
-        click.getPlayer().sendMessage("You clicked the diamond!");
-    })
-    .onClose(player -> player.sendMessage("Menu closed."));
-
-menu.open(player);
-```
-
-- `OnyxLib.gui(title, rows)` creates a new menu (1-6 rows). Titles can be a `Component` or a plain `String`.
-- `.item(slot, stack, onClick)` places a button; `onClick` receives an `OnyxGuiClickEvent` with the player, slot, and click type. Pass `null` (or omit the consumer) for a purely decorative button.
-- `.fill(stack)` fills every currently-empty slot, handy for borders/backgrounds.
-- `.cancelClicksByDefault(false)` disables the default click-cancelling if you want players to be able to take/move items.
-- `.onClose(player -> ...)` runs when the menu is closed.
-- Menus are NOT registered like items/blocks — each `OnyxLib.gui(...)` call returns a fresh, standalone instance you configure and `.open(player)` yourself. Reuse one instance to share state across viewers, or build a new one per player for per-player state.
-- In-game, operators can run `/onyx gui` to browse and pull any registered element from a generated menu — a working example of the API in action.
 
 ## Contributing
 Contributions and bug reports are welcome.

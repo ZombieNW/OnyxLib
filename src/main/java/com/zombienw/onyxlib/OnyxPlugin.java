@@ -1,7 +1,6 @@
 package com.zombienw.onyxlib;
 
 import com.zombienw.onyxlib.impl.block.OnyxBlockListener;
-import com.zombienw.onyxlib.impl.gui.OnyxGuiListener;
 import com.zombienw.onyxlib.impl.registry.NamespaceRegistry;
 import org.bukkit.command.Command;
 import org.bukkit.command.PluginCommand;
@@ -21,7 +20,6 @@ public class OnyxPlugin extends JavaPlugin implements Listener {
     public void onEnable() {
         getServer().getPluginManager().registerEvents(this, this);
         getServer().getPluginManager().registerEvents(new OnyxBlockListener(this), this);
-        getServer().getPluginManager().registerEvents(new OnyxGuiListener(), this);
 
         // Register command
         PluginCommand pluginCommand = getCommand("onyx");

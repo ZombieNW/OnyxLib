@@ -1,13 +1,10 @@
 package com.zombienw.onyxlib;
 
 import com.zombienw.onyxlib.api.OnyxElement;
-import com.zombienw.onyxlib.api.OnyxLib;
-import com.zombienw.onyxlib.api.gui.OnyxGui;
 import com.zombienw.onyxlib.impl.pack.PackGenerator;
 import com.zombienw.onyxlib.impl.registry.NamespaceRegistry;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -36,7 +33,7 @@ public class OnyxCommand implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(@NonNull CommandSender sender, @NonNull Command command, @NonNull String label, String[] args) {
         if (args.length == 0) {
-            sender.sendMessage(Component.text("Usage: /onyx <give|generatePack|gui>", NamedTextColor.RED));
+            sender.sendMessage(Component.text("Usage: /onyx <give|generatePack>", NamedTextColor.RED));
             return true;
         }
 
@@ -45,7 +42,6 @@ public class OnyxCommand implements CommandExecutor, TabCompleter {
         return switch (subCommand) {
             case "generatepack" -> handleGeneratePack(sender);
             case "give" -> handleGive(sender, args);
-            case "gui" -> handleGui(sender);
             default -> false;
         };
     }
@@ -113,47 +109,6 @@ public class OnyxCommand implements CommandExecutor, TabCompleter {
         return true;
     }
 
-    /**
-     * Opens an admin GUI listing every registered OnyxLib element (items/blocks)
-     * across all namespaces. Restricted to server operators.
-     */
-    private boolean handleGui(CommandSender sender) {
-        if (!(sender instanceof Player player)) {
-            sender.sendMessage(Component.text("Only players can open guis.", NamedTextColor.RED));
-            return true;
-        }
-
-        if (!player.isOp()) {
-            sender.sendMessage(Component.text("You must be an operator to use this command.", NamedTextColor.RED));
-            return true;
-        }
-
-        List<OnyxElement> elements = NamespaceRegistry.getAllNamespaces().stream()
-                .flatMap(ns -> ns.getElements().stream())
-                .toList();
-
-        int rows = Math.max(1, Math.min(6, (int) Math.ceil(elements.size() / 9.0)));
-        OnyxGui gui = OnyxLib.gui("OnyxLib Elements", rows)
-                .fill(new ItemStack(Material.GRAY_STAINED_GLASS_PANE));
-
-        int slots = rows * 9;
-        for (int i = 0; i < elements.size() && i < slots; i++) {
-            OnyxElement element = elements.get(i);
-
-            gui.item(i, element.create(), click -> {
-                click.getPlayer().getInventory().addItem(element.create());
-                click.getPlayer().sendMessage(Component.text("Given " + element.getKey(), NamedTextColor.GREEN));
-            });
-        }
-
-        if (elements.isEmpty()) {
-            player.sendMessage(Component.text("No OnyxLib elements are currently registered.", NamedTextColor.YELLOW));
-        }
-
-        gui.open(player);
-        return true;
-    }
-
     @Override
     public List<String> onTabComplete(@NonNull CommandSender sender, @NonNull Command command, @NonNull String alias, String @NonNull [] args) {
         if (!sender.hasPermission("onyxlib.admin")) {
@@ -163,7 +118,7 @@ public class OnyxCommand implements CommandExecutor, TabCompleter {
         String currentArg = args[args.length - 1].toLowerCase();
 
         if (args.length == 1) {
-            return Stream.of("give", "generatePack", "gui")
+            return Stream.of("give", "generatePack")
                     .filter(sub -> sub.toLowerCase().startsWith(currentArg))
                     .toList();
         }
