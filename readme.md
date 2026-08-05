@@ -17,7 +17,7 @@ OnyxLib is a work-in-progress library for creating server-side content to use on
 - Build tool: Maven or Gradle (support depends on the plugin template you use).
 
 ## Usage
-- Check the official [docs](https://onyx.zombienw.com/docs/getting-started) for usage
+- Check the official [docs](https://onyx.zombienw.com/docs/getting-started) to get started with **OnyxLib**
 
 ## Contributing
 Contributions and bug reports are welcome.
