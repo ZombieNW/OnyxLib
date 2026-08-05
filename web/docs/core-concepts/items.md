@@ -31,6 +31,20 @@ ns.item("strawberry")
 "textures": { "0": "myplugin:item/cool_sword", "particle": "myplugin:item/cool_sword" },
 ```
 
+#### Model Parent Configuration
+You can specify the Minecraft item model parent using the `ItemModelParent` enum. Available options:
+- `DEFAULT` - "item/generated" (default)
+- `HANDHELD` - "item/handheld"
+- `HANDHELD_ROD` - "item/handheld_rod"
+
+Usage example:
+```java
+ns.item("steel_sword")
+    .baseItem(Material.IRON_SWORD)
+    .texture("items/steel_sword", ItemModelParent.HANDHELD);
+```
+The system automatically falls back to `DEFAULT` if no parent is explicitly specified.
+
 ## ItemMeta Escape Hatch
 
 OnyxLib is not trying to reinvent the Bukkit API. If you need to modify enchantments, attributes, or persistent data, use the `itemMeta()` consumer. This provides direct access to the underlying `ItemMeta` before the item is built.
