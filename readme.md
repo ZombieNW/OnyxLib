@@ -9,7 +9,7 @@ OnyxLib is a work-in-progress library for creating server-side content to use on
 - Modular architecture: each plugin built with OnyxLib acts as an independent content pack.
 - Automatic asset merge: a utility collects and merges installed pack assets into a single usable package.
 - API surface for registering custom items, blocks, recipes, and resources.
-- Server-side only — no client mods required.
+- Server-side only, no client mods required.
 
 ## Requirements
 - PaperMC server compatible with your target Minecraft version.
