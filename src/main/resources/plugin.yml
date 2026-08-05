@@ -7,7 +7,7 @@ load: STARTUP
 commands:
     onyx:
         description: OnyxLib admin commands
-        usage: /onyx <give|generatepack>
+        usage: /onyx <give|generatepack|gui>
         permission: onyxlib.admin
         permission-message: You don't have permission to use OnyxLib commands.
 
