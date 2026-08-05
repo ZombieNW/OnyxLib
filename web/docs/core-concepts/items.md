@@ -52,7 +52,7 @@ OnyxLib is not trying to reinvent the Bukkit API. If you need to modify enchantm
 ```java
 ns.item("steel_sword")
     .baseItem(Material.IRON_SWORD)
-    .texture("items/steel_sword")
+    .texture("items/steel_sword", ItemModelParent.HANDHELD)
     .itemMeta(meta -> {
         AttributeModifier modifier = new AttributeModifier(
             NamespacedKey.minecraft("attack_damage"),
