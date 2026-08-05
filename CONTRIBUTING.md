@@ -4,6 +4,8 @@ Thank you for being interested in contributing to OnyxLib!
 
 To ensure this project remains focused and maintainable, I've put forth some guidelines on what does and does not belong in OnyxLib. Please read this document before submitting a PR to prevent a conflict in vision.
 
+For further reference on how I, ZombieNW, think about OnyxLib, see the `/devdocs` directory.
+
 ## Core Philosophy (Goals)
 
 OnyxLib is a framework for creating custom content using PaperMC, specifically focused on streamlining asset management.
@@ -22,3 +24,7 @@ To further prevent scope-creep and bloat, here are some examples of things that 
 
 - **Wrappers & Generators:** We do not want to re-invent the wheel, things already implemented in PaperMC should be left for the end-developer to use.
 - **Logic Archetypes:** We do not want to provide rigid, pre-packaged item templates (e.g., `OnyxWeapon`, `OnyxFood`, or `OnyxTool`). Custom behavior and event listening are the responsibility of the end-developer using listeners or `itemMeta`.
+
+## Documentation
+
+To document your work, see the Docusaurus instance located in `/web`. New pages can be added by adding a properly formatted markdown document to the `/web/docs` directory.
