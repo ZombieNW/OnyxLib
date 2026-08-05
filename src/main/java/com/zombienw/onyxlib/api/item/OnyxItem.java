@@ -1,19 +1,16 @@
 package com.zombienw.onyxlib.api.item;
 
 import com.zombienw.onyxlib.api.OnyxElement;
+import java.util.function.Consumer;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-
-import java.util.function.Consumer;
 
 /**
  * Represents a custom item.
  * Acts as the builder for itself.
  */
 public interface OnyxItem extends OnyxElement {
-
     /**
      * Sets the underlying vanilla material for this item.
      * Required for the item to be created.
@@ -46,6 +43,18 @@ public interface OnyxItem extends OnyxElement {
      * @return This OnyxItem instance.
      */
     OnyxItem texture(String path);
+
+    /**
+     * Sets the relative path to the texture file, WITHOUT the .png extension.
+     * The path is relative to assets/<namespace>/textures/ in your plugin jar.
+     * <p>
+     * Example: texture("items/strawberry") -> assets/myplugin/textures/items/strawberry.png
+     *
+     * @param path The path without extension (e.g., "items/strawberry")
+     * @param parentModel Optional parent model to use for this texture (default: ItemModelParent.DEFAULT)
+     * @return This OnyxItem instance.
+     */
+    OnyxItem texture(String path, ItemModelParent parentModel);
 
     /**
      * Sets the relative path to the developer made JSON item model.
