@@ -36,11 +36,13 @@ ns.block("marble")
 ```
 
 #### Required Props
+
 ```java
 .baseBlock(Material)
 ```
 
 #### Optional Props
+
 ```java
 .displayName(String)
 .display(Consumer<BlockDisplayBuilder>)
@@ -95,14 +97,13 @@ public void onPlayerInteract(PlayerInteractEvent event) {
     if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
         Block clickedBlock = event.getClickedBlock();
         OnyxBlock customBlock = ns.matchBlock(clickedBlock);
-        
+
         if (customBlock != null && customBlock.getId().equals("engine")) {
             player.sendMessage("Engine Started!");
         }
     }
 }
 ```
-
 
 ### Events & Lifecycle
 
@@ -117,17 +118,17 @@ public void onChairPlace(OnyxBlockPlaceEvent event) {
     if (!event.getOnyxBlock().getId().equals("oak_chair")) return;
 
     Location loc = event.getBlock().getLocation().add(0.5, 0.0, 0.5);
-    
+
     // Spawn an armor stand to handle sitting
     ArmorStand chairSeat = loc.getWorld().spawn(loc, ArmorStand.class, armorStand -> {
         armorStand.setVisible(false);
         armorStand.setGravity(false);
         armorStand.setMarker(true);
-        
+
         // Tag it
         armorStand.getPersistentDataContainer().set(
-            new NamespacedKey("my_plugin", "chair_seat"), 
-            PersistentDataType.BOOLEAN, 
+            new NamespacedKey("my_plugin", "chair_seat"),
+            PersistentDataType.BOOLEAN,
             true
         );
     });
