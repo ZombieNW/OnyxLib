@@ -13,37 +13,11 @@ OnyxLib is a work-in-progress library for creating server-side content to use on
 
 ## Requirements
 - PaperMC server compatible with your target Minecraft version.
-- Java 17+ (or the Java version recommended by your target PaperMC release).
+- Java 21+
 - Build tool: Maven or Gradle (support depends on the plugin template you use).
 
-## Quick install
-1. Add OnyxLib as a dependency in your plugin project (Maven/Gradle).  
-2. Implement your plugin using the provided skeleton and APIs.  
-3. Drop the plugin JAR into the server `plugins/` folder and restart the server.
-
-Example dependency and packaging details will be provided once official artifacts are published.
-
-## Quick usage
-- /onyx generatepack  
-  Gathers and merges all installed content packs’ assets into a single package ready for the server.
-
-## Developing a content pack
-Recommended structure:
-- assets/
-- data/
-- config.yml
-- plugin.yml (or pack manifest)
-
-During plugin initialization, register your custom items/blocks via OnyxLib’s APIs and include the required resource files in assets/ and data/ to be merged into the generated pack.
-
-## Minimal example (pseudo)
-1. Extend your plugin main class.
-2. In onEnable():
-   - Register a custom item.
-   - Register a block or recipe.
-3. Provide related resources under `assets/` and `data/`.
-
-Concrete code examples and templates will be added to the documentation as the project matures.
+## Usage
+- Check the official [docs](https://onyx.zombienw.com/docs/getting-started) to get started with **OnyxLib**
 
 ## Contributing
 Contributions and bug reports are welcome.
