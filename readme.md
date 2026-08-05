@@ -13,7 +13,7 @@ OnyxLib is a work-in-progress library for creating server-side content to use on
 
 ## Requirements
 - PaperMC server compatible with your target Minecraft version.
-- Java 21+ (or the Java version recommended by your target PaperMC release).
+- Java 21+
 - Build tool: Maven or Gradle (support depends on the plugin template you use).
 
 ## Usage
