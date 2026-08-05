@@ -29,12 +29,12 @@ public class ModelGenerator {
 
             String modelJson = """
                 {
-                  "parent": "minecraft:item/generated",
+                  "parent": "%s",
                   "textures": {
                     "layer0": "%s"
                   }
                 }
-                """.formatted(textureRef);
+                """.formatted(item.getParentModel().getValue(), textureRef);
 
             Files.writeString(modelDest, modelJson);
         }
