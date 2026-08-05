@@ -4,24 +4,24 @@
 
 ![Language](https://badgen.net/badge/language/Java/orange) ![License](https://badgen.net/badge/license/MIT/red) ![Framework](https://badgen.net/badge/framework/PaperMC/blue)
 
-OnyxLib is a work-in-progress library for creating server-side content to use on PaperMC servers. It aims to make it easy to add custom items, blocks, assets, and other content types as modular "content packs."
+OnyxLib is a library for creating server-side content to use on PaperMC servers. It aims to make it easy to add custom items, blocks, assets, and other content types as modular "content packs."
 
 ## Key features
 
-- Modular architecture: each plugin built with OnyxLib acts as an independent content pack.
-- Automatic asset merge: a utility collects and merges installed pack assets into a single usable package.
-- API surface for registering custom items, blocks, recipes, and resources.
-- Server-side only, no client mods required.
+- **Modular Architecture:** OnyxLib plugins act as independent content packs.
+- **Resource Pack Generator:** OnyxLib plugin assets are collected and merged into a single resource pack.
+- Developer-friendly API surface for registering custom content.
+- Server-side only, no client mod installation required.
 
 ## Requirements
 
-- PaperMC server compatible with your target Minecraft version.
+- PaperMC Development Environment (26.1+ Supported)
 - Java 21+
-- Build tool: Maven or Gradle (support depends on the plugin template you use).
+- Build tool: Maven or Gradle
 
 ## Usage
 
-- Check the official [docs](https://onyx.zombienw.com/docs/getting-started) to get started with **OnyxLib**
+Check the official [docs](https://onyx.zombienw.com/docs/getting-started) to get started with OnyxLib.
 
 ## Contributing
 
@@ -37,8 +37,8 @@ Please see [CONTRIBUTING](./CONTRIBUTING.md)
 
 ## License
 
-This project is licensed under the MIT License. See the LICENSE file for details.
+This project is licensed under the MIT License. See [LICENSE](./LICENSE.md) for details.
 
 ## Support
 
-Open an issue on the repository for questions, bug reports, or feature requests.
+For support, open an issue or [join my Discord](https://discord.gg/tKFMy85).
