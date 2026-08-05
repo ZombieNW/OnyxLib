@@ -1,5 +1,6 @@
 package com.zombienw.onyxlib.impl.item;
 
+import com.zombienw.onyxlib.api.item.ItemModelParent;
 import com.zombienw.onyxlib.api.item.OnyxItem;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -26,6 +27,7 @@ public class OnyxItemImpl implements OnyxItem {
     private String texturePath;
     private String customModelPath;
     private Consumer<ItemMeta> metaConsumer;
+    private ItemModelParent parentModel = ItemModelParent.DEFAULT;
 
     public OnyxItemImpl(String id, NamespacedKey elementKey, NamespacedKey onyxKey) {
         this.id = id;
@@ -38,6 +40,7 @@ public class OnyxItemImpl implements OnyxItem {
     public String getCustomModelPath() { return customModelPath; }
     public Material getBaseMaterial() { return baseMaterial; }
     public NamespacedKey getKey() { return elementKey; }
+    public ItemModelParent getParentModel() { return parentModel; }
 
     @Override
     public OnyxItem baseItem(Material material) {
@@ -63,7 +66,12 @@ public class OnyxItemImpl implements OnyxItem {
 
     @Override
     public OnyxItem texture(@NotNull String path) {
-        // check for dev adding extension
+        return texture(path, ItemModelParent.DEFAULT);
+    }
+
+    @Override
+	public OnyxItem texture(String path, ItemModelParent parentModel) {
+	    // check for dev adding extension
         if (path.endsWith(".png")) {
             throw new IllegalArgumentException(
                     "Texture path for item '" + id + "' must not include the .png extension. " +
@@ -72,8 +80,9 @@ public class OnyxItemImpl implements OnyxItem {
         }
 
         this.texturePath = path;
+        this.parentModel = parentModel != null ? parentModel : ItemModelParent.DEFAULT;
         return this;
-    }
+	}
 
     @Override
     public OnyxItem model(@NotNull String path) {
