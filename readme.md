@@ -1,13 +1,32 @@
 # OnyxLib
-### _Server side-only content creation library_
+### _Server-side content-creation library for PaperMC_
 
 ![Language](https://badgen.net/badge/language/Java/orange) ![License](https://badgen.net/badge/license/MIT/red) ![Framework](https://badgen.net/badge/framework/PaperMC/blue)
 
-## What?
-OnyxLib is a work-in-progress content-creation library to add custom content to PaperMC servers. Custom items, blocks, and other content types can be added.
+OnyxLib is a work-in-progress library for creating server-side content to use on PaperMC servers. It aims to make it easy to add custom items, blocks, assets, and other content types as modular "content packs."
 
-## Principles
-OnyxLib plugins are designed to be extremely modular. Each plugin made with OnyxLib is a sort of "content pack." Using `/onyx generatepack`, **all** installed plugin assets will be merged into a single resource pack that can be installed on the server. All content from all plugins can be given using the `/onyx give` command.
+## Key features
+- Modular architecture: each plugin built with OnyxLib acts as an independent content pack.
+- Automatic asset merge: a utility collects and merges installed pack assets into a single usable package.
+- API surface for registering custom items, blocks, recipes, and resources.
+- Server-side only, no client mods required.
 
-## Documentation
-As OnyxLib is incredibly early in development, no documentation is available.
+## Requirements
+- PaperMC server compatible with your target Minecraft version.
+- Java 21+
+- Build tool: Maven or Gradle (support depends on the plugin template you use).
+
+## Usage
+- Check the official [docs](https://onyx.zombienw.com/docs/getting-started) to get started with **OnyxLib**
+
+## Contributing
+Contributions and bug reports are welcome.
+1. Open an issue describing the change or problem.
+2. Submit a pull request with a clear description and tests/examples where appropriate.
+3. Follow project coding conventions.
+
+## License
+This project is licensed under the MIT License. See the LICENSE file for details.
+
+## Support
+Open an issue on the repository for questions, bug reports, or feature requests.
