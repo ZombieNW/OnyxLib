@@ -4,7 +4,7 @@
 
 ![Language](https://badgen.net/badge/language/Java/orange) ![License](https://badgen.net/badge/license/MIT/red) ![Framework](https://badgen.net/badge/framework/PaperMC/blue)
 
-OnyxLib is a library for creating server-side content to use on PaperMC servers. It aims to make it easy to add custom items, blocks, assets, and other content types as modular "content packs."
+OnyxLib is a library for creating server-side content to use on PaperMC servers. It aims to make it easy to add custom content as modular "content packs."
 
 ## Key features
 
