@@ -3,7 +3,6 @@ package com.zombienw.onyxlib.impl.registry;
 
 import com.zombienw.onyxlib.api.OnyxElement;
 import com.zombienw.onyxlib.api.OnyxNamespace;
-import com.zombienw.onyxlib.impl.item.OnyxItemImpl;
 import org.bukkit.NamespacedKey;
 import org.bukkit.plugin.Plugin;
 import org.jspecify.annotations.NonNull;

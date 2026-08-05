@@ -1,12 +1,10 @@
 package com.zombienw.onyxlib.api.block;
 
 import com.zombienw.onyxlib.api.OnyxElement;
-import com.zombienw.onyxlib.api.item.OnyxItem;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.function.Consumer;
 

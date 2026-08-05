@@ -2,7 +2,6 @@ package com.zombienw.onyxlib.api.event;
 
 import com.zombienw.onyxlib.api.block.OnyxBlock;
 import org.bukkit.block.Block;
-import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.block.BlockEvent;

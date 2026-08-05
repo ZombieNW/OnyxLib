@@ -2,7 +2,6 @@ package com.zombienw.onyxlib;
 
 import com.zombienw.onyxlib.impl.block.OnyxBlockListener;
 import com.zombienw.onyxlib.impl.registry.NamespaceRegistry;
-import org.bukkit.command.Command;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
